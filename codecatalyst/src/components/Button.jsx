@@ -12,7 +12,7 @@ function Button({
   iconPosition = 'left',
   ...props
 }) {
-  // Define styles based on variant and size
+
   const baseStyles = 'font-semibold rounded focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all';
   const variantStyles = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
@@ -26,7 +26,7 @@ function Button({
     large: 'px-6 py-3 text-lg',
   };
 
-  // Combine styles
+
   const buttonStyles = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
 
   return (
