@@ -44,7 +44,6 @@ const router = createBrowserRouter([
         path:"/ide",
         element:(
           <AuthLayout authRequired={true}>
-            <Header/>
             <Ide/>
           </AuthLayout>
         )
@@ -53,7 +52,6 @@ const router = createBrowserRouter([
         path:"/guest",
         element:(
           <AuthLayout authRequired={false}>
-            <Header/>
             <Ide/>
           </AuthLayout>
         )

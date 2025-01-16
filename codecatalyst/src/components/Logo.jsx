@@ -1,7 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Logo({ className = "" }) {
   return (
+  <Link to={"/"}>
     <div>
       <svg
         width="800px"
@@ -331,6 +333,7 @@ function Logo({ className = "" }) {
         </g>
       </svg>
     </div>
+    </Link>
   );
 }
 

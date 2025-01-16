@@ -1,13 +1,20 @@
-import React from 'react'
+import React from 'react';
 
-function Card({title,description,icon}) {
+function Card({ title, description, icon }) {
   return (
-    <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-    <span className="material-icons text-blue-600 text-6xl">{icon}</span>
-    <h2 className="mt-4 text-xl font-semibold text-gray-800">{title}</h2>
-    <p className="mt-2 text-gray-600 text-center">{description}</p>
+    <div className="flex flex-col items-center p-6 bg-gray-800 rounded-lg shadow-lg hover:shadow-cyan-500/20 hover:-translate-y-2 transition-all duration-300 border border-cyan-500/20">
+      {/* Icon */}
+      <span className="material-icons text-6xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+        {icon}
+      </span>
+
+      {/* Title */}
+      <h2 className="mt-4 text-xl font-semibold text-white">{title}</h2>
+
+      {/* Description */}
+      <p className="mt-2 text-gray-300 text-center">{description}</p>
     </div>
   );
 }
 
-export default Card
+export default Card;

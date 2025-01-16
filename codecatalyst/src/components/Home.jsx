@@ -9,57 +9,59 @@ function Home() {
     {
       title: 'AI Chatbot Support',
       description: 'Get real-time coding help and suggestions using our AI-powered assistant.',
-      icon: 'chat', 
+      icon: '🤖', // Emoji or icon
     },
     {
       title: 'Integrated Terminal',
       description: 'Run commands and debug your code with a built-in terminal.',
-      icon: 'terminal',
+      icon: '💻',
     },
     {
       title: 'Flexible Input Options',
       description: 'Use keyboard, voice, or even handwriting to write your code.',
-      icon: 'input', 
+      icon: '⌨️',
     },
     {
       title: 'Multiple Themes',
       description: 'Switch between dark, light, and custom themes for a personalized experience.',
-      icon: 'palette', 
+      icon: '🎨',
     },
     {
       title: 'Code Anywhere',
       description: 'Access your projects and collaborate in real-time from any device.',
-      icon: 'code', 
+      icon: '🌐',
     },
     {
       title: 'Rich Editor',
       description: 'Enjoy syntax highlighting, auto-completion, and more.',
-      icon: 'edit', 
+      icon: '✍️',
     },
     {
       title: 'File Saving with Login',
       description: 'Save your files securely and access them anytime when logged in.',
-      icon: 'save', 
+      icon: '🔒',
     },
     {
       title: 'Multiple Languages Supported',
       description: 'Write and run code in various programming languages, including Python, Java, and C++.',
-      icon: 'language',
+      icon: '🌍',
     },
   ];
 
   return (
-    <div className="w-full">
-      <div className="text-center p-8 bg-gray-100 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-blue-600">Welcome to Your Coding Playground!</h1>
-        <p className="mt-4 text-gray-700">
+    <div className="w-full min-h-screen bg-gray-900 text-white">
+      {/* Hero Section */}
+      <div className="text-center p-8 bg-gradient-to-r from-cyan-800 to-blue-900 rounded-lg shadow-lg mx-4">
+        <h1 className="text-4xl font-bold text-white">Welcome to CodeCatalyst!</h1>
+        <p className="mt-4 text-gray-200">
           Programming isn't about what you know; it's about what you can figure out. – Chris Pine
         </p>
         <div className="mt-6 flex flex-col items-center space-y-4">
           <Button
             variant="primary"
             size="medium"
-            onClick={()=>navigate("/guest")}
+            onClick={() => navigate('/guest')}
+            className="hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
           >
             Explore as Guest
           </Button>
@@ -68,27 +70,27 @@ function Home() {
             size="medium"
             icon={<span className="material-icons">lock_open</span>}
             iconPosition="left"
-            onClick={()=>navigate("/signup")}
+            onClick={() => navigate('/signup')}
+            className="hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
           >
-            Sign up for free to
-            Unlock More Features
+            Sign up for free to Unlock More Features
           </Button>
         </div>
-        
-        <p className="mt-4 text-sm text-gray-600">
+        <p className="mt-4 text-sm text-gray-300">
           Log in to access advanced features like file saving and personalized settings.
         </p>
       </div>
 
+      {/* Features Section */}
       <div className="mt-10 p-8">
-        <h2 className="text-2xl font-bold text-center text-gray-800">Features</h2>
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <h2 className="text-3xl font-bold text-center text-cyan-400">Features</h2>
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {features.map((feature) => (
             <Card
-              key={feature.title} 
-              title={feature.title}   
-              description={feature.description} 
-              icon={feature.icon} 
+              key={feature.title}
+              title={feature.title}
+              description={feature.description}
+              icon={feature.icon}
             />
           ))}
         </div>

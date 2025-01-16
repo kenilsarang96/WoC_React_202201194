@@ -1,22 +1,29 @@
-import React, { useState,useCallback } from "react";
+import React, { useState, useCallback } from "react";
+import { Resizable } from "react-resizable"; 
+import "react-resizable/css/styles.css";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
 import { oneDark } from "@codemirror/theme-one-dark";
-import { basicLight, basicLightInit, basicDark, basicDarkInit } from '@uiw/codemirror-theme-basic';
+import { basicLight } from "@uiw/codemirror-theme-basic";
 import { lineNumbers } from "@codemirror/view";
 import { autocompletion } from "@codemirror/autocomplete";
-import Button from "./Button"; 
+import Button from "./Button";
 import Terminal from "./Terminal";
 import AiChat from "./AiChat";
+import Filebar from "./Filebar";
+import { useSelector } from "react-redux";
+import Header from "./Header";
 
 function Ide() {
   const [code, setCode] = useState("console.log('Hello, world!');");
-  const [language, setLanguage] = useState("javascript"); 
-  const [theme, setTheme] = useState("oneDark"); 
-  const [isWrappingEnabled, setIsWrappingEnabled] = useState(false); 
+  const [language, setLanguage] = useState("javascript");
+  const [theme, setTheme] = useState("oneDark");
+  const [isWrappingEnabled, setIsWrappingEnabled] = useState(false);
   const [isTerminalVisible, setIsTerminalVisible] = useState(false);
-
+  const [isFileBarVisible, setIsFileBarVisible] = useState(false);
+  const [fileBarWidth, setFileBarWidth] = useState(250); 
+  const authStatus = useSelector((state) => state.auth.AuthStaus);
 
   const onChange = useCallback((value) => {
     setCode(value);
@@ -28,10 +35,6 @@ function Ide() {
         return javascript();
       case "python":
         return python();
-      case "html":
-        return html();
-      case "css":
-        return css();
       default:
         return javascript();
     }
@@ -48,60 +51,129 @@ function Ide() {
     }
   };
 
+  const onResize = (event, { size }) => {
+    setFileBarWidth(size.width); 
+  };
+
   return (
-    <div className="flex flex-col h-screen">
+    <>
+      <Header />
+      <div className="flex flex-col h-screen">
       
-  
-      <div className="flex items-center justify-between p-4 bg-gray-800 text-white">
+        <div className="flex items-center justify-between p-1 bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg">
+      
+          <div className="flex items-center gap-2">
+            {authStatus && (
+              <Button
+                onClick={() => setIsFileBarVisible((prev) => !prev)}
+                className="p-2 hover:bg-gray-700"
+                variant="ghost"
+              >
+                <span className="material-icons">menu</span>
+              </Button>
+            )}
+          </div>
 
-        <Button
-          onClick={() => setIsTerminalVisible((prev)=>!prev)}
-          className="p-2 !border-0 hover:bg-gray-700" 
-        >
-          <span className="material-icons">terminal</span>
-        </Button>
+          <div className="flex items-center gap-4">
 
-        <select
-          value={language}
-          onChange={()=>setLanguage(e.target.value)}
-          className="p-2 bg-gray-700 rounded-md"
-        >
-          <option value="javascript">JavaScript</option>
-          <option value="python">Python</option>
-        </select>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="p-2 bg-gray-700 text-white rounded-md shadow-md focus:ring focus:ring-cyan-500"
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+            </select>
 
-        <select
-          value={theme}
-          onChange={()=>setTheme(e.target.value)}
-          className="p-2 bg-gray-700 rounded-md"
-        >
-          <option value="oneDark">One Dark</option>
-          <option value="basicLight">basic Light</option>
-        </select>
+            <select
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
+              className="p-2 bg-gray-700 text-white rounded-md shadow-md focus:ring focus:ring-cyan-500"
+            >
+              <option value="oneDark">One Dark</option>
+              <option value="basicLight">Basic Light</option>
+            </select>
+          </div>
 
-        <Button onClick={() => console.log("Running code:", code)}>
-          Run Code
-        </Button>
+          <div className="flex items-center gap-2">
+ 
+            <Button
+              onClick={() => console.log("Running code:", code)}
+              variant="primary"
+              className="p-2"
+            >
+              Run Code
+            </Button>
 
-        <Button onClick={() => setIsWrappingEnabled((prev)=>!prev)}>
-          {isWrappingEnabled ? "Disable Wrapping" : "Enable Wrapping"}
-        </Button>
+            <Button
+              onClick={() => setIsWrappingEnabled((prev) => !prev)}
+              variant="outline"
+              className="p-2"
+            >
+              {isWrappingEnabled ? "Disable Wrapping" : "Enable Wrapping"}
+            </Button>
+
+
+            <Button
+              onClick={() => setIsTerminalVisible((prev) => !prev)}
+              variant="ghost"
+              className="p-2"
+            >
+              <span className="material-icons">terminal</span>
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-1">
+
+          {isFileBarVisible && (
+            <Resizable
+              width={fileBarWidth}
+              height={Infinity} 
+              onResize={onResize}
+              minConstraints={[200, Infinity]}
+              maxConstraints={[400, Infinity]} 
+              axis="x" 
+              resizeHandles={["e"]} 
+            >
+              <div
+                style={{ width: fileBarWidth }}
+                className="bg-gray-800 text-white p-4"
+              >
+                <Filebar onClose={() => setIsFileBarVisible(false)} />
+              </div>
+            </Resizable>
+          )}
+
+          <div
+            style={{
+              width: `calc(100% - ${isFileBarVisible ? fileBarWidth : 0}px)`,
+            }}
+            className="h-full overflow-hidden"
+          >
+            <div className="h-full overflow-auto bg-gray-900">
+              <CodeMirror
+                value={code}
+                extensions={[getLanguageExtension(), lineNumbers(), autocompletion()]}
+                theme={getTheme()}
+                height="100vh"
+                width="100%"
+                onChange={onChange}
+                basicSetup={{
+                  lineWrapping: isWrappingEnabled,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {isTerminalVisible && (
+          <Terminal onClose={() => setIsTerminalVisible((prev) => !prev)} />
+        )}
+
+        <AiChat />
       </div>
-
-      <CodeMirror
-        value={code}
-        height="calc(100vh - 64px)" 
-        width="100%"
-        extensions={[getLanguageExtension(), lineNumbers(), autocompletion()]}
-        theme={getTheme()}
-        onChange={onChange}
-        basicSetup={{
-          lineWrapping: isWrappingEnabled, 
-        }}
-      />
-      {isTerminalVisible && <Terminal onClose={()=>setIsTerminalVisible((prev)=>!prev)} />}
-        <AiChat></AiChat>
-    </div>
+    </>
   );
 }
 
