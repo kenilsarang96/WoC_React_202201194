@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
 import Button from "./Button";
 import { GoogleGenerativeAI } from "@google/generative-ai";

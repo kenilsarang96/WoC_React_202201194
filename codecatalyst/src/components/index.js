@@ -8,7 +8,9 @@ import Login from "./Login"
 import Signup from "./Signup"
 import Ide from "./Ide"
 import Button from "./Button"
+import Terminal from "./Terminal"
+import AiChat from "./AiChat"
 
 
-export {AuthLayout,Header,Footer,Home,Logo,Card,Login,Signup,Ide,Button};
+export {AuthLayout,Header,Footer,Home,Logo,Card,Login,Signup,Ide,Button,Terminal,AiChat};
 

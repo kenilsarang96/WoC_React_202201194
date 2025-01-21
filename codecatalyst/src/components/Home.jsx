@@ -2,6 +2,8 @@ import React from 'react';
 import Card from './Card';
 import Button from './Button';
 import { useNavigate } from 'react-router-dom';
+import UpcomingContestsPopup from './UpcomingContestsPopup';
+
 
 function Home() {
   const navigate = useNavigate();
@@ -9,7 +11,7 @@ function Home() {
     {
       title: 'AI Chatbot Support',
       description: 'Get real-time coding help and suggestions using our AI-powered assistant.',
-      icon: '🤖', // Emoji or icon
+      icon: '🤖', 
     },
     {
       title: 'Integrated Terminal',
@@ -50,7 +52,7 @@ function Home() {
 
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white">
-      {/* Hero Section */}
+      
       <div className="text-center p-8 bg-gradient-to-r from-cyan-800 to-blue-900 rounded-lg shadow-lg mx-4">
         <h1 className="text-4xl font-bold text-white">Welcome to CodeCatalyst!</h1>
         <p className="mt-4 text-gray-200">
@@ -81,7 +83,6 @@ function Home() {
         </p>
       </div>
 
-      {/* Features Section */}
       <div className="mt-10 p-8">
         <h2 className="text-3xl font-bold text-center text-cyan-400">Features</h2>
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -95,6 +96,7 @@ function Home() {
           ))}
         </div>
       </div>
+      <UpcomingContestsPopup />
     </div>
   );
 }

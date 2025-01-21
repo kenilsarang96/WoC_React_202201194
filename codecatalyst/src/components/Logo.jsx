@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Logo({ className = "" }) {
+  const authStatus = useSelector((state) => state.auth.AuthStaus);
+  const path = authStatus ? "/ide" : "/"
   return (
-  <Link to={"/"}>
+  <Link  to={path}>
     <div>
       <svg
         width="800px"
