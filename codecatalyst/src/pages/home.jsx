@@ -4,7 +4,7 @@ import { Home as HomeComponent,Header,Footer } from '../components'
 function Home() {
   return (
     <div>
-          <Header/>
+           <Header/>
            <HomeComponent/>
            <Footer/>
     </div>

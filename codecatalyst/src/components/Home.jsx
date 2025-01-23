@@ -9,24 +9,24 @@ function Home() {
   const navigate = useNavigate();
   const features = [
     {
+      title: 'Multiple Themes',
+      description: 'Switch between dark, light, and custom themes for a personalized experience.',
+      icon: '🎨',
+    },
+    {
+      title: 'Download File',
+      description: 'Download your code files directly to your device for offline access.',
+      icon: '📥',
+    },
+    {
       title: 'AI Chatbot Support',
-      description: 'Get real-time coding help and suggestions using our AI-powered assistant.',
-      icon: '🤖', 
+      description: 'Get real-time coding help using our AI-powered assistant.',
+      icon: '🤖',
     },
     {
       title: 'Integrated Terminal',
       description: 'Run commands and debug your code with a built-in terminal.',
       icon: '💻',
-    },
-    {
-      title: 'Flexible Input Options',
-      description: 'Use keyboard, voice, or even handwriting to write your code.',
-      icon: '⌨️',
-    },
-    {
-      title: 'Multiple Themes',
-      description: 'Switch between dark, light, and custom themes for a personalized experience.',
-      icon: '🎨',
     },
     {
       title: 'Code Anywhere',
@@ -48,7 +48,7 @@ function Home() {
       description: 'Write and run code in various programming languages, including Python, Java, and C++.',
       icon: '🌍',
     },
-  ];
+];
 
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white">

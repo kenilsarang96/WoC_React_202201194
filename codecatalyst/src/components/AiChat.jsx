@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import "react-resizable/css/styles.css";
 import Button from "./Button";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Rnd } from "react-rnd";
+import { model } from "../conf/conf";
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 function AiChat() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -18,6 +16,8 @@ function AiChat() {
     x: -400,
     y: -400,
   });
+
+  
 
   const handleSendMessage = async (e) => {
     e.preventDefault();

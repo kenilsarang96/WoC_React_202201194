@@ -19,8 +19,9 @@ function Filebar() {
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [editingFileId, setEditingFileId] = useState(null);
   const [editFileName, setEditFileName] = useState("");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [fileToDeleteId, setFileToDeleteId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const openDialog = () => {
     setIsDialogOpen(true);
@@ -54,7 +55,7 @@ function Filebar() {
   const handleAddFile = () => {
     if (newFileName.trim()) {
       const newFile = {
-        id: Date.now().toString(),
+        id: Date.now(),
         name: newFileName.trim(),
         language: newFileLanguage,
         code: getCodeSnippet(newFileLanguage),
@@ -64,11 +65,42 @@ function Filebar() {
     }
   };
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const fileName = file.name;
+      const fileExtension = fileName.split(".").pop().toLowerCase(); 
+
+      
+      const languageData = LANGUAGE_DATA.find(
+        (lang) => lang.extension === fileExtension
+      );
+
+      if (languageData) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target.result;
+          const newFile = {
+            id: Date.now(),
+            name: fileName.replace(`.${fileExtension}`, ""), 
+            language: languageData.language,
+            code: content,
+          };
+          dispatch(addFile(newFile));
+        };
+        reader.readAsText(file);
+        setErrorMessage(""); 
+      } else {
+        setErrorMessage(`Files with .${fileExtension} extension are not supported.`);
+      }
+    }
+  };
+
   const handleDeleteFile = (id) => {
     setFileToDeleteId(id);
-    setIsDeleteDialogOpen(true); 
+    setIsDeleteDialogOpen(true);
   };
-  
+
   const handleSaveEdit = () => {
     if (editFileName.trim()) {
       dispatch(updateFileName({ id: editingFileId, name: editFileName }));
@@ -79,26 +111,25 @@ function Filebar() {
   const handleSelectFile = (id) => {
     dispatch(selectFile(id));
   };
-  
+
   const confirmDelete = () => {
     if (fileToDeleteId) {
-      dispatch(deleteFile(fileToDeleteId)); 
-      setIsDeleteDialogOpen(false); 
-      setFileToDeleteId(null); 
+      dispatch(deleteFile(fileToDeleteId));
+      setIsDeleteDialogOpen(false);
+      setFileToDeleteId(null);
     }
   };
 
   const cancelDelete = () => {
-    setIsDeleteDialogOpen(false); 
-    setFileToDeleteId(null); 
+    setIsDeleteDialogOpen(false);
+    setFileToDeleteId(null);
   };
-
 
   const getLanguageIcon = (language) => {
     const languageData = LANGUAGE_DATA.find(
       (lang) => lang.language === language
     );
-    return languageData ? languageData.icon : ""; 
+    return languageData ? languageData.icon : "";
   };
 
   return (
@@ -110,6 +141,24 @@ function Filebar() {
         <span className="material-icons mr-2">add</span>
         Add File
       </button>
+
+      <input
+        type="file"
+        id="file-upload"
+        style={{ display: "none" }}
+        onChange={handleFileUpload}
+      />
+      <label
+        htmlFor="file-upload"
+        className="w-full p-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-md mb-4 flex items-center justify-center hover:from-green-600 hover:to-teal-700 hover:shadow-green-500/50 hover:-translate-y-1 transition-all cursor-pointer"
+      >
+        <span className="material-icons mr-2">upload</span>
+        Upload File
+      </label>
+
+      {errorMessage && (
+        <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
+      )}
 
       {isDialogOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -191,7 +240,9 @@ function Filebar() {
       {isDeleteDialogOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-900 p-6 rounded-md w-96 border border-cyan-500/20">
-            <h2 className="text-lg font-bold mb-4 text-cyan-400">Confirm Delete</h2>
+            <h2 className="text-lg font-bold mb-4 text-cyan-400">
+              Confirm Delete
+            </h2>
             <p className="mb-4">Are you sure you want to delete this file?</p>
             <div className="flex justify-end gap-2">
               <button
@@ -237,20 +288,22 @@ function Filebar() {
                 {file.name}
               </button>
 
-              {file.id !== 1 && (<div className="flex gap-2">
-                <button
-                  onClick={() => openRenameDialog(file.id, file.name)}
-                  className="p-1 bg-gradient-to-r from-yellow-500 to-amber-600 text-white rounded-md flex items-center hover:from-yellow-600 hover:to-amber-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-                >
-                  <span className="material-icons">edit</span>
-                </button>
-                <button
-                  onClick={() => handleDeleteFile(file.id)}
-                  className="p-1 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-md flex items-center hover:from-red-600 hover:to-pink-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-                >
-                  <span className="material-icons">delete</span>
-                </button>
-              </div>)}
+              {file.id !== 1 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openRenameDialog(file.id, file.name)}
+                    className="p-1 bg-gradient-to-r from-yellow-500 to-amber-600 text-white rounded-md flex items-center hover:from-yellow-600 hover:to-amber-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
+                  >
+                    <span className="material-icons">edit</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteFile(file.id)}
+                    className="p-1 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-md flex items-center hover:from-red-600 hover:to-pink-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
+                  >
+                    <span className="material-icons">delete</span>
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>

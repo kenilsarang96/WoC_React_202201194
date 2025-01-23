@@ -10,7 +10,8 @@ import Ide from "./Ide"
 import Button from "./Button"
 import Terminal from "./Terminal"
 import AiChat from "./AiChat"
+import UpcomingContestsPopup from "./UpcomingContestsPopup"
 
 
-export {AuthLayout,Header,Footer,Home,Logo,Card,Login,Signup,Ide,Button,Terminal,AiChat};
+export {AuthLayout,Header,Footer,Home,Logo,Card,Login,Signup,Ide,Button,Terminal,AiChat,UpcomingContestsPopup};
 

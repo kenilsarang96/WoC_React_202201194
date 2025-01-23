@@ -24,11 +24,11 @@ function Header({ className = "" }) {
 
   return (
     <>
-      {/* Header */}
+  
       <header
         className={`flex items-center justify-between px-6 py-4 bg-gray-900 shadow-lg border-b border-cyan-500/20 ${className}`}
       >
-        {/* Logo and Brand Name */}
+      
         <div className="flex items-center">
           <Logo className="h-10 w-10 mr-2" />
           <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
@@ -36,7 +36,7 @@ function Header({ className = "" }) {
           </span>
         </div>
 
-        {/* Navigation Buttons */}
+     
         <div className="flex items-center space-x-4">
           {location.pathname !== "/ide" && (
             <>
@@ -75,7 +75,7 @@ function Header({ className = "" }) {
         </div>
       </header>
 
-      {/* Logout Modal */}
+  
       {showLogoutModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-cyan-500/20">

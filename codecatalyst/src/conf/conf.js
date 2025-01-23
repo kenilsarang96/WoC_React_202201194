@@ -1,4 +1,5 @@
 import {initializeApp} from 'firebase/app'
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 
 const firebaseConfig = {
@@ -10,4 +11,8 @@ const firebaseConfig = {
   appId: String(import.meta.env.VITE_FIREBASE_APP_ID),
   };
   
- export const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GEMINI_KEY);
+
+export const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });

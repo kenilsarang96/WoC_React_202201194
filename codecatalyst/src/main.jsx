@@ -5,7 +5,8 @@ import App from './App.jsx'
 import { Provider } from 'react-redux'
 import store from "./store/store.js"
 import { RouterProvider,createBrowserRouter } from 'react-router-dom'
-import {Header,Login,Signup,Footer,Home, Ide,AuthLayout} from "./components"
+import {Home,Login,Signup,Ide} from "./pages"
+import {AuthLayout} from "./components"
 
 const router = createBrowserRouter([
   {
@@ -17,9 +18,7 @@ const router = createBrowserRouter([
         element:(
           <>
            <AuthLayout authRequired={false}>
-           <Header/>
            <Home/>
-           <Footer/>
            </AuthLayout>
            </>
         )
@@ -52,7 +51,7 @@ const router = createBrowserRouter([
         path:"/guest",
         element:(
           <AuthLayout authRequired={false}>
-            <Ide/>
+             <Ide/>
           </AuthLayout>
         )
       }

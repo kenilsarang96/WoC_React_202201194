@@ -6,7 +6,7 @@ const initialState = {
             id: 1,
             name : "main",
             language :"javascript",
-            code : "console.log('Hello, World!');",
+            code : `function welcome() {\n\tconsole.log("Welcome to codeCatalyst");\n}\n\nwelcome();\n`,
         },
     ],
     selectedFileId : 1
@@ -17,9 +17,8 @@ const fileSlice = createSlice({
     initialState,
     reducers :{
          addFile : (state,action) =>{
-            const {name,language,code} = action.payload;
+            const {id,name,language,code} = action.payload;
             const newFile = {
-                id : nanoid(),
                 name,
                 language,
                 code,
