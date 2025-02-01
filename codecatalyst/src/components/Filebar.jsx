@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  addFile,
-  deleteFile,
-  updateFileName,
+  createFile,
+  removeFile,
+  modifyFileName,
   selectFile,
+  fetchFiles, // Import the fetchFiles action
 } from "../store/fileSlice";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
 
@@ -12,6 +13,7 @@ function Filebar() {
   const dispatch = useDispatch();
   const files = useSelector((state) => state.file.files);
   const selectedFileId = useSelector((state) => state.file.selectedFileId);
+  const userId = useSelector((state) => state.auth.userId);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newFileName, setNewFileName] = useState("");
@@ -22,6 +24,13 @@ function Filebar() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [fileToDeleteId, setFileToDeleteId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Fetch files when the component mounts
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchFiles(userId));
+    }
+  }, [dispatch, userId]);
 
   const openDialog = () => {
     setIsDialogOpen(true);
@@ -52,16 +61,19 @@ function Filebar() {
     return languageData ? languageData.codeSnippet : "";
   };
 
-  const handleAddFile = () => {
+  const handleAddFile = async () => {
     if (newFileName.trim()) {
       const newFile = {
-        id: Date.now(),
         name: newFileName.trim(),
         language: newFileLanguage,
         code: getCodeSnippet(newFileLanguage),
       };
-      dispatch(addFile(newFile));
-      closeDialog();
+      try {
+        await dispatch(createFile({ userId, file: newFile }));
+        closeDialog();
+      } catch (error) {
+        console.error("Failed to create file:", error);
+      }
     }
   };
 
@@ -69,27 +81,29 @@ function Filebar() {
     const file = event.target.files[0];
     if (file) {
       const fileName = file.name;
-      const fileExtension = fileName.split(".").pop().toLowerCase(); 
+      const fileExtension = fileName.split(".").pop().toLowerCase();
 
-      
       const languageData = LANGUAGE_DATA.find(
         (lang) => lang.extension === fileExtension
       );
 
       if (languageData) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           const content = e.target.result;
           const newFile = {
-            id: Date.now(),
-            name: fileName.replace(`.${fileExtension}`, ""), 
+            name: fileName.replace(`.${fileExtension}`, ""),
             language: languageData.language,
             code: content,
           };
-          dispatch(addFile(newFile));
+          try {
+            await dispatch(createFile({ userId, file: newFile }));
+          } catch (error) {
+            console.error("Failed to upload file:", error);
+          }
         };
         reader.readAsText(file);
-        setErrorMessage(""); 
+        setErrorMessage("");
       } else {
         setErrorMessage(`Files with .${fileExtension} extension are not supported.`);
       }
@@ -101,24 +115,35 @@ function Filebar() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSaveEdit = () => {
-    if (editFileName.trim()) {
-      dispatch(updateFileName({ id: editingFileId, name: editFileName }));
-      closeRenameDialog();
+  const handleSaveEdit = async () => {
+    if (editFileName.trim() && editingFileId) {
+      try {
+        await dispatch(
+          modifyFileName(userId, editingFileId, editFileName) 
+        );
+        closeRenameDialog();
+      } catch (error) {
+        console.error("Failed to rename file:", error);
+      }
     }
-  };
+};
+
 
   const handleSelectFile = (id) => {
     dispatch(selectFile(id));
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (fileToDeleteId) {
-      dispatch(deleteFile(fileToDeleteId));
-      setIsDeleteDialogOpen(false);
-      setFileToDeleteId(null);
+      try {
+        await dispatch(removeFile(userId, fileToDeleteId)); 
+        setIsDeleteDialogOpen(false);
+        setFileToDeleteId(null);
+      } catch (error) {
+        console.error("Failed to delete file:", error);
+      }
     }
-  };
+};
 
   const cancelDelete = () => {
     setIsDeleteDialogOpen(false);

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 function AuthLayout({ children, authRequired = true }) {
   const navigate = useNavigate();
   const [loader, setLoader] = useState(true);
-  const authStatus = useSelector((state) => state.auth.AuthStaus);
+  const authStatus = useSelector((state) => state.auth.AuthStatus);
 
   useEffect(() => {
     console.log("Your Auth Status is", authStatus);
@@ -16,9 +16,7 @@ function AuthLayout({ children, authRequired = true }) {
   }, [authStatus, navigate, authRequired]);
 
   return loader ? (
-   
-        <p className="text-cyan-500 text-lg font-semibold">Loading...</p>
-
+    <p className="text-lg font-semibold">Loading...</p>
   ) : (
     <>{children}</>
   );

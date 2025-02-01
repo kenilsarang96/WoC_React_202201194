@@ -16,11 +16,9 @@ const router = createBrowserRouter([
       {
         path:"/",
         element:(
-          <>
            <AuthLayout authRequired={false}>
            <Home/>
            </AuthLayout>
-           </>
         )
       },
       {
@@ -58,6 +56,9 @@ const router = createBrowserRouter([
     ]
   }
 ])
+
+
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

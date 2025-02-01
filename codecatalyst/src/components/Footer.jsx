@@ -1,6 +1,8 @@
 import React from "react";
 import { FaGithub } from "react-icons/fa"; 
 
+
+
 function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300 py-6 border-t border-cyan-500/20">

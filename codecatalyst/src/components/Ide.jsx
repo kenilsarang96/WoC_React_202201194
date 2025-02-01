@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
 import CodeMirror from "@uiw/react-codemirror";
@@ -12,7 +12,7 @@ import { useLanguageData } from "../hooks/useLanguageData";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
 import { THEMES, getTheme } from "../utils/themesUtils";
 import { handleDownload } from "../utils/downloadUtils";
-import { updateFileCode } from "../store/fileSlice";
+import { modifyFileCode,fetchFiles } from "../store/fileSlice";
 import {
   AppBar,
   Toolbar,
@@ -25,6 +25,8 @@ import {
   Button,
   Box,
   Tooltip,
+  Card,
+  CardContent
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -37,9 +39,10 @@ import Terminal from "./Terminal";
 import AiChat from "./AiChat";
 import Filebar from "./Filebar";
 
-const themeColor = "#000000"; 
+const themeColor = "#000000";
 
 function Ide() {
+ 
   const [theme, setTheme] = useState("oneDark");
   const [isWrappingEnabled, setIsWrappingEnabled] = useState(false);
   const [isTerminalVisible, setIsTerminalVisible] = useState(false);
@@ -52,10 +55,11 @@ function Ide() {
   const [shouldExecuteCode, setShouldExecuteCode] = useState(false);
 
   const dispatch = useDispatch();
-  const authStatus = useSelector((state) => state.auth.AuthStaus);
+  const authStatus = useSelector((state) => state.auth.AuthStatus);
   const selectedFileId = useSelector((state) => state.file.selectedFileId);
   const files = useSelector((state) => state.file.files);
   const selectedFile = files.find((file) => file.id === selectedFileId);
+  const userId = useSelector((state)=> state.auth.userId);
 
   const { language, code, setCode, selectedLanguageData, handleLanguageChange } = useLanguageData();
 
@@ -75,10 +79,7 @@ function Ide() {
   };
 
   const handleEditorChange = (value) => {
-    setCode(value);
-    if (authStatus && selectedFileId) {
-      dispatch(updateFileCode({ id: selectedFileId, code: value }));
-    }
+    setCode(value); // This will trigger the auto-save logic in useLanguageData
   };
 
   const handleDownloadClick = () => {
@@ -103,10 +104,8 @@ function Ide() {
 
   return (
     <div className="flex flex-col h-screen">
-    
       <AppBar position="static" sx={{ bgcolor: themeColor }}>
         <Toolbar>
-       
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             {authStatus && (
               <Tooltip title="Toggle File Bar">
@@ -163,7 +162,7 @@ function Ide() {
               <Button
                 variant="contained"
                 sx={{
-                  bgcolor: "#4CAF50", 
+                  bgcolor: "#4CAF50",
                   "&:hover": { bgcolor: "#45a049" },
                 }}
                 onClick={handleRunCode}
@@ -181,7 +180,6 @@ function Ide() {
             </Tooltip>
           </Box>
 
-     
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Tooltip title="Decrease Font Size">
               <IconButton color="inherit">
@@ -208,7 +206,7 @@ function Ide() {
                   onChange={() => setIsWrappingEnabled((prev) => !prev)}
                   sx={{
                     "& .MuiSwitch-thumb": {
-                      color: isWrappingEnabled ? "#4CAF50" : "#f44336", 
+                      color: isWrappingEnabled ? "#4CAF50" : "#f44336",
                     },
                     "& .MuiSwitch-track": {
                       backgroundColor: isWrappingEnabled ? "#4CAF50" : "#f44336",
@@ -221,7 +219,7 @@ function Ide() {
             <Tooltip title="Download Code">
               <IconButton
                 onClick={handleDownloadClick}
-                sx={{ color: "#2196F3" }} 
+                sx={{ color: "#2196F3" }}
               >
                 <DownloadIcon />
               </IconButton>
@@ -230,7 +228,6 @@ function Ide() {
         </Toolbar>
       </AppBar>
 
-  
       <div className="flex flex-1">
         {authStatus && isFileBarVisible && (
           <Resizable
@@ -247,6 +244,7 @@ function Ide() {
             </div>
           </Resizable>
         )}
+
         <div
           style={{
             width: `calc(100% - ${authStatus && isFileBarVisible ? fileBarWidth : 0}px)`,
@@ -254,6 +252,63 @@ function Ide() {
           className="h-full overflow-hidden"
         >
           <div className="h-full overflow-auto bg-gray-900">
+
+          {authStatus && !selectedFileId && (
+            <div className="flex items-center justify-center w-full h-full bg-gray-900 text-white">
+            <Card
+              sx={{
+                maxWidth: 400,
+                width: "100%",
+                padding: 2,
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                borderRadius: 2,
+                boxShadow: 3,
+              }}
+            >
+              <CardContent>
+                <Typography
+                  variant="h5"
+                  align="center"
+                  sx={{
+                    marginBottom: 2,
+                    fontWeight: "bold",
+                    color: "#fff",
+                  }}
+                >
+                  Create a New File to Start Working
+                </Typography>
+                <Typography
+                  variant="body1"
+                  align="center"
+                  sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    marginBottom: 3,
+                  }}
+                >
+                  Start by creating your first file. Once you create a file, you can start editing and running code.
+                </Typography>
+                <Box display="flex" justifyContent="center">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: 16,
+                      paddingX: 4,
+                      paddingY: 1.5,
+                    }}
+                    onClick={()=>(setIsFileBarVisible(true))}
+                  >
+                    Create New File
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </div>
+      
+              )}
+      
+         {authStatus && files.length > 0 && selectedFileId && (
             <CodeMirror
               value={code}
               extensions={[
@@ -271,6 +326,7 @@ function Ide() {
               }}
               style={{ fontSize: `${fontSize}px` }}
             />
+          )}
           </div>
         </div>
       </div>

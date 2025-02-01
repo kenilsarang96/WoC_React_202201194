@@ -1,58 +1,98 @@
-import { createSlice,nanoid } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import databaseService from "../firebase/db";
 
 const initialState = {
-    files:[
-        {
-            id: 1,
-            name : "main",
-            language :"javascript",
-            code : `function welcome() {\n\tconsole.log("Welcome to codeCatalyst");\n}\n\nwelcome();\n`,
-        },
-    ],
-    selectedFileId : 1
-}
+    files: [],
+    selectedFileId: null,
+};
 
 const fileSlice = createSlice({
-    name : "file",
+    name: "file",
     initialState,
-    reducers :{
-         addFile : (state,action) =>{
-            const {id,name,language,code} = action.payload;
-            const newFile = {
-                name,
-                language,
-                code,
-            }
+    reducers: {
+        setFiles: (state, action) => {
+            state.files = action.payload;
+        },
+        addFile: (state, action) => {
             state.files.push(action.payload);
-         },
-         deleteFile : (state,action)=>{
-            state.files = state.files.filter((file)=> file.id !== action.payload);
-            if(state.selectedFileId == action.payload){
-                state.selectedFileId = state.files[0].id;
+        },
+        deleteFile: (state, action) => {
+            state.files = state.files.filter((file) => file.id !== action.payload);
+            if (state.selectedFileId === action.payload) {
+                state.selectedFileId = state.files.length ? state.files[0].id : null;
             }
-         },
-         updateFileCode : (state,action)=>{
-            const {id,code} = action.payload;
-            state.files.map((file)=>{
-                if(file.id == id){
-                    file.code = code;
-                }
-            })
-         },
-         selectFile : (state,action)=>{
+        },
+        updateFileCode: (state, action) => {
+            const { id, code } = action.payload;
+            const file = state.files.find((file) => file.id === id);
+            if (file) {
+                file.code = code;
+            }
+        },
+        selectFile: (state, action) => {
             state.selectedFileId = action.payload;
-         },
-         updateFileName : (state,action)=>{
-            const {id,name} = action.payload;
-            state.files.map((file)=>{
-                if(file.id == id){
-                    file.name = name;
-                }
-            })
-         }
+        },
+        updateFileName: (state, action) => {
+            const { id, name } = action.payload;
+            const file = state.files.find((file) => file.id === id);
+            if (file) {
+                file.name = name;
+            }
+        }
+    },
+});
+
+export const { setFiles, addFile, deleteFile, updateFileCode, selectFile, updateFileName } = fileSlice.actions;
+
+// Thunk actions
+export const fetchFiles = (userId) => async (dispatch) => {
+    try {
+        const files = await databaseService.getFiles(userId);
+        dispatch(setFiles(files));
+    } catch (error) {
+        console.error("Failed to fetch files:", error);
     }
-})
+};
 
+export const createFile = (data) => async (dispatch) => {
+    const { userId, file } = data;
+    if (!file || !file.name || !file.language || !file.code) {
+        throw new Error("File data is incomplete.");
+    }
+    try {
+        const fileId = await databaseService.addFile(userId, file);
+        dispatch(addFile({ id: fileId, ...file }));
+    } catch (error) {
+        console.error("Failed to create file:", error);
+        throw error;
+    }
+};
 
-export const {addFile,deleteFile,updateFileCode,selectFile,updateFileName} = fileSlice.actions;
+export const removeFile = (userId, fileId) => async (dispatch) => {
+    try {
+        await databaseService.deleteFile(userId, fileId);
+        dispatch(deleteFile(fileId)); 
+    } catch (error) {
+        console.error("Failed to delete file:", error);
+    }
+};
+
+export const modifyFileCode = (userId, fileId, code) => async (dispatch) => {
+    try {
+        await databaseService.updateFile(userId, fileId, { code });
+        dispatch(updateFileCode({ id: fileId, code }));
+    } catch (error) {
+        console.error("Failed to update file code:", error);
+    }
+};
+
+export const modifyFileName = (userId, fileId, name) => async (dispatch) => {
+    try {
+        await databaseService.updateFile(userId, fileId, { name });
+        dispatch(updateFileName({ id: fileId, name }));
+    } catch (error) {
+        console.error("Failed to update file name:", error);
+    }
+};
+
 export default fileSlice.reducer;
