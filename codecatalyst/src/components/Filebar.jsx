@@ -26,11 +26,11 @@ function Filebar() {
   const [errorMessage, setErrorMessage] = useState("");
 
   // Fetch files when the component mounts
-  useEffect(() => {
-    if (userId) {
-      dispatch(fetchFiles(userId));
-    }
-  }, [dispatch, userId]);
+  // useEffect(() => {
+  //   if (userId) {
+  //     dispatch(fetchFiles(userId));
+  //   }
+  // }, [dispatch, userId]);
 
   const openDialog = () => {
     setIsDialogOpen(true);
@@ -136,7 +136,7 @@ function Filebar() {
   const confirmDelete = async () => {
     if (fileToDeleteId) {
       try {
-        await dispatch(removeFile(userId, fileToDeleteId)); 
+        dispatch(removeFile(userId, fileToDeleteId)); 
         setIsDeleteDialogOpen(false);
         setFileToDeleteId(null);
       } catch (error) {

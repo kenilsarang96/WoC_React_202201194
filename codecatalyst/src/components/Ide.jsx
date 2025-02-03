@@ -60,8 +60,15 @@ function Ide() {
   const files = useSelector((state) => state.file.files);
   const selectedFile = files.find((file) => file.id === selectedFileId);
   const userId = useSelector((state)=> state.auth.userId);
+   useEffect(() => {
+      if (userId) {
+        dispatch(fetchFiles(userId));
+      }
+    }, [dispatch, files.length]);
 
   const { language, code, setCode, selectedLanguageData, handleLanguageChange } = useLanguageData();
+  
+
 
   const onResize = (event, { size }) => {
     setFileBarWidth(size.width);
@@ -79,7 +86,7 @@ function Ide() {
   };
 
   const handleEditorChange = (value) => {
-    setCode(value); // This will trigger the auto-save logic in useLanguageData
+    setCode(value); 
   };
 
   const handleDownloadClick = () => {
@@ -299,7 +306,7 @@ function Ide() {
                     }}
                     onClick={()=>(setIsFileBarVisible(true))}
                   >
-                    Create New File
+                    Open Filebar
                   </Button>
                 </Box>
               </CardContent>
@@ -308,7 +315,7 @@ function Ide() {
       
               )}
       
-         {authStatus && files.length > 0 && selectedFileId && (
+         {(!authStatus ||  (authStatus && files.length > 0 && selectedFileId)) && (
             <CodeMirror
               value={code}
               extensions={[
@@ -327,6 +334,7 @@ function Ide() {
               style={{ fontSize: `${fontSize}px` }}
             />
           )}
+
           </div>
         </div>
       </div>

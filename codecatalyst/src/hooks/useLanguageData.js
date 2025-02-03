@@ -1,39 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { modifyFileCode } from "../store/fileSlice"; // Import the modifyFileCode action
 
 export const useLanguageData = () => {
-  
+  const dispatch = useDispatch();
   const authStatus = useSelector((state) => state.auth.AuthStatus);
+  const userId = useSelector((state) => state.auth.userId);
   const selectedFile = useSelector((state) => {
     const selectedFileId = state.file.selectedFileId;
     return state.file.files.find((file) => file.id === selectedFileId);
   });
 
-
   const [language, setLanguage] = useState("javascript");
   const [code, setCode] = useState("");
-
+  const saveTimeoutRef = useRef(null); 
 
   useEffect(() => {
     if (!authStatus) {
       const savedLanguage = localStorage.getItem("language");
       const savedCode = localStorage.getItem("code");
-      if (savedLanguage) {
-        setLanguage(savedLanguage);
-      }
-      if (savedCode) {
-        setCode(savedCode);
-      }
+      if (savedLanguage) setLanguage(savedLanguage);
+      if (savedCode) setCode(savedCode);
     }
   }, [authStatus]);
-  
+
   useEffect(() => {
     if (!authStatus) {
       localStorage.setItem("code", code);
     }
   }, [code, authStatus]);
-  
+
   useEffect(() => {
     if (authStatus && selectedFile) {
       setLanguage(selectedFile.language);
@@ -41,35 +38,38 @@ export const useLanguageData = () => {
     }
   }, [authStatus, selectedFile]);
 
-
- 
   const selectedLanguageData = LANGUAGE_DATA.find((lang) => lang.language === language);
-
 
   const handleLanguageChange = (selectedLanguage) => {
     setLanguage(selectedLanguage);
     const selectedLangData = LANGUAGE_DATA.find((lang) => lang.language === selectedLanguage);
+    if (selectedLangData) setCode(selectedLangData.codeSnippet);
+    if (!authStatus) localStorage.setItem("language", selectedLanguage);
+  };
 
-    if (selectedLangData) {
-      setCode(selectedLangData.codeSnippet);
-      console.log("Updated language and code snippet:", {
-        language: selectedLanguage,
-        code: selectedLangData.codeSnippet,
-      });
-    }
+  const handleCodeChange = (newCode) => {
+    setCode(newCode); 
+    if (authStatus && selectedFile) {
+      localStorage.setItem("code", newCode); 
 
-    
-    if (!authStatus) {
-      localStorage.setItem("language", selectedLanguage);
-      console.log("Saved language to local storage:", selectedLanguage);
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = setTimeout(() => {
+        try {
+          dispatch(modifyFileCode(userId, selectedFile.id, newCode));
+          console.log("Code saved to Firestore.");
+        } catch (error) {
+          console.error("Failed to save code to Firestore:", error);
+        }
+      }, 5000);
     }
   };
 
-  
   return {
     language,
     code,
-    setCode,
+    setCode: handleCodeChange,
     selectedLanguageData,
     handleLanguageChange,
   };
