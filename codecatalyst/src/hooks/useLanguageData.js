@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
 import { useSelector, useDispatch } from "react-redux";
-import { modifyFileCode } from "../store/fileSlice"; // Import the modifyFileCode action
+import { modifyFileCode } from "../store/fileSlice";
 
 export const useLanguageData = () => {
   const dispatch = useDispatch();

@@ -8,7 +8,6 @@ function AuthLayout({ children, authRequired = true }) {
   const authStatus = useSelector((state) => state.auth.AuthStatus);
 
   useEffect(() => {
-    console.log("Your Auth Status is", authStatus);
     if (!authStatus && authRequired) {
       navigate("/");
     }

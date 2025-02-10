@@ -4,6 +4,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login, logout } from "./store/authSlice.js";
 import { ClipLoader } from "react-spinners";
+import {ToastContainer} from "react-toastify";
 
 function App() {
   const [loading, setLoading] = useState(true); 
@@ -13,11 +14,9 @@ function App() {
   useEffect(() => {
     const unsubscribe = authService.onAuthStateChanged((user) => {
       if (user) {
-        console.log(user);
         dispatch(login(user.uid)); 
         navigate("/ide");
       } else {
-        console.log("you are logged out");
         dispatch(logout()); 
       }
       setLoading(false); 
@@ -36,10 +35,21 @@ function App() {
 
  
   return (
-    <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
+    <div className="min-h-screen flex flex-wrap content-between bg-black">
       <div className="w-full block">
         <Outlet />
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false} 
+        newestOnTop={false}
+        closeOnClick 
+        rtl={false} 
+        pauseOnFocusLoss
+        draggable 
+        pauseOnHover 
+      />
     </div>
   );
 }

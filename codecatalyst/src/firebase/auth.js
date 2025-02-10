@@ -1,6 +1,15 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    GoogleAuthProvider, 
+    signInWithPopup, 
+    signOut, 
+    onAuthStateChanged 
+} from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 import { app } from "../conf/conf.js";
+import { toast } from "react-toastify"; 
 
 export class AuthService {
     auth;
@@ -13,26 +22,46 @@ export class AuthService {
         this.firestore = getFirestore(app);
     }
 
-
     async signupHandler(email, password) {
         try {
+           
+            if (!email || typeof email !== "string" || !email.includes("@")) {
+                toast.error("Please enter a valid email address.");
+                throw new Error("Invalid email address");
+            }
+            if (!password || typeof password !== "string" || password.length < 6) {
+                toast.error("Password must be at least 6 characters long.");
+                throw new Error("Password must be at least 6 characters long");
+            }
+
             const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-            console.log("User signed up:", userCredential.user);
+            toast.success("Signup successful! Welcome!"); 
             return userCredential.user;
         } catch (error) {
             console.error("Error signing up:", error);
+            toast.error("Signup failed. Please try again."); 
             throw error;
         }
     }
 
-
     async signinHandler(email, password) {
         try {
+ 
+            if (!email || typeof email !== "string" || !email.includes("@")) {
+                toast.error("Please enter a valid email address.");
+                throw new Error("Invalid email address");
+            }
+            if (!password || typeof password !== "string") {
+                toast.error("Please enter a valid password.");
+                throw new Error("Invalid password");
+            }
+
             const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-            console.log("User signed in:", userCredential.user);
+            toast.success("Login successful! Welcome back!"); 
             return userCredential.user;
         } catch (error) {
-            console.error("Error signing in:", error);
+            console.error("Error signing in:", error); 
+            toast.error("Login failed. Please check your credentials and try again.");
             throw error;
         }
     }
@@ -40,33 +69,36 @@ export class AuthService {
     async SignUpWithGoogle() {
         try {
             const result = await signInWithPopup(this.auth, this.googleProvider);
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
             const user = result.user;
-            console.log("User signed up with Google:", user);
+            toast.success("Google signup successful! Welcome!"); 
             return user;
         } catch (error) {
-            console.error("Error signing up with Google:", error);
+            console.error("Error signing up with Google:", error); 
+            toast.error("Google signup failed. Please try again.");
             throw error;
         }
     }
-
 
     async logoutHandler() {
         try {
             await signOut(this.auth);
-            console.log("User logged out");
+            toast.success("Logged out successfully!"); 
         } catch (error) {
-            console.error("Error logging out:", error);
+            console.error("Error logging out:", error); 
+            toast.error("Logout failed. Please try again."); 
             throw error;
         }
     }
 
-
     onAuthStateChanged(callback) {
-        return onAuthStateChanged(this.auth, callback);
+        try {
+            return onAuthStateChanged(this.auth, callback);
+        } catch (error) {
+            console.error("Error setting up auth state listener:", error); 
+            toast.error("An error occurred. Please refresh the page.");
+            throw error;
+        }
     }
-
 }
 
 const authService = new AuthService();

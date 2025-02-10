@@ -16,7 +16,7 @@ function Signup() {
   const signupHandler = async (name, email, password) => {
     try {
       const user = await authService.signupHandler(email, password);
-      dispatch(login({ email, name }));
+      dispatch(login(user.uid))
       navigate("/ide");
     } catch (error) {
       console.error("Error signing up:", error);
@@ -27,7 +27,7 @@ function Signup() {
     authService
       .SignUpWithGoogle()
       .then((user) => {
-        dispatch(login({ email: user.email, name: user.displayName }));
+        dispatch(login(user.uid))
         navigate("/ide");
       })
       .catch((error) => console.error(error));

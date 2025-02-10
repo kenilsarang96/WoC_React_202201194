@@ -4,6 +4,7 @@ import databaseService from "../firebase/db";
 const initialState = {
     files: [],
     selectedFileId: null,
+    loading : false
 };
 
 const fileSlice = createSlice({
@@ -12,8 +13,9 @@ const fileSlice = createSlice({
     reducers: {
         setFiles: (state, action) => {
             state.files = action.payload;
+            state.loading = false;
         },
-        addFile: (state, action) => {
+        addFile:  (state, action) => {
             state.files.push(action.payload);
         },
         deleteFile: (state, action) => {
@@ -38,19 +40,25 @@ const fileSlice = createSlice({
             if (file) {
                 file.name = name;
             }
+        },
+        setLoading: (state, action) => {
+            state.loading = action.payload;
         }
     },
 });
 
-export const { setFiles, addFile, deleteFile, updateFileCode, selectFile, updateFileName } = fileSlice.actions;
+export const { setFiles, addFile, deleteFile, updateFileCode, selectFile, updateFileName,setLoading } = fileSlice.actions;
 
 // Thunk actions
 export const fetchFiles = (userId) => async (dispatch) => {
+    dispatch(setLoading(true));
     try {
         const files = await databaseService.getFiles(userId);
         dispatch(setFiles(files));
     } catch (error) {
         console.error("Failed to fetch files:", error);
+    } finally{
+        dispatch(setLoading(false));
     }
 };
 

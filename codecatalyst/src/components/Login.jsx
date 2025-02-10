@@ -16,7 +16,7 @@ function Login() {
   const signinHandler = async (email, password) => {
     try {
       const user = await authService.signinHandler(email, password);
-      dispatch(login({ email: user.email }));
+      dispatch(login(user.uid));
       navigate('/ide');
     } catch (error) {
       switch (error.code) {
@@ -47,7 +47,7 @@ function Login() {
     authService
       .SignUpWithGoogle()
       .then((user) => {
-        dispatch(login({ email: user.email }));
+        dispatch(login(user.uid))
         navigate('/ide');
       })
       .catch((error) => console.error(error));

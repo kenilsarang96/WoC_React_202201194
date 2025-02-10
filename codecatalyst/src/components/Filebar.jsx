@@ -5,15 +5,27 @@ import {
   removeFile,
   modifyFileName,
   selectFile,
-  fetchFiles, // Import the fetchFiles action
 } from "../store/fileSlice";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
+import { fetchFiles } from "../store/fileSlice";
+
 
 function Filebar() {
   const dispatch = useDispatch();
   const files = useSelector((state) => state.file.files);
   const selectedFileId = useSelector((state) => state.file.selectedFileId);
   const userId = useSelector((state) => state.auth.userId);
+  const authStatus = useSelector((state) => state.auth.AuthStatus);
+  const loading = useSelector(state => state.file.loading);
+
+  useEffect(() => {
+    if (userId) {
+      console.log("hello");
+      dispatch(fetchFiles(userId));
+    }
+}, [dispatch, files.length,authStatus]);
+
+
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newFileName, setNewFileName] = useState("");
@@ -25,12 +37,6 @@ function Filebar() {
   const [fileToDeleteId, setFileToDeleteId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch files when the component mounts
-  // useEffect(() => {
-  //   if (userId) {
-  //     dispatch(fetchFiles(userId));
-  //   }
-  // }, [dispatch, userId]);
 
   const openDialog = () => {
     setIsDialogOpen(true);
@@ -157,8 +163,12 @@ function Filebar() {
     return languageData ? languageData.icon : "";
   };
 
+
+ 
+
   return (
-    <div className="flex flex-col bg-gray-900 text-white p-4 border-r border-cyan-500/20 h-full">
+    <div className="flex flex-col bg-gray-900 text-white p-4 border-r border-cyan-500/20 h-full overflow-y-auto">
+
       <button
         onClick={openDialog}
         className="w-full p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-md mb-4 flex items-center justify-center hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
@@ -291,7 +301,10 @@ function Filebar() {
 
       <div>
         <h2 className="text-lg font-bold mb-4 text-cyan-400">Files</h2>
-        <ul>
+
+        {loading && (<div> loading...</div>)}
+
+        {!loading &&  (<ul>
           {files.map((file) => (
             <li
               key={file.id}
@@ -313,7 +326,7 @@ function Filebar() {
                 {file.name}
               </button>
 
-              {file.id !== 1 && (
+             
                 <div className="flex gap-2">
                   <button
                     onClick={() => openRenameDialog(file.id, file.name)}
@@ -328,11 +341,13 @@ function Filebar() {
                     <span className="material-icons">delete</span>
                   </button>
                 </div>
-              )}
+                
             </li>
           ))}
-        </ul>
+        </ul>)}
       </div>
+
+
     </div>
   );
 }
