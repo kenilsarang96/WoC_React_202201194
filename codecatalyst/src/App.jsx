@@ -5,6 +5,9 @@ import { useDispatch } from "react-redux";
 import { login, logout } from "./store/authSlice.js";
 import { ClipLoader } from "react-spinners";
 import {ToastContainer} from "react-toastify";
+import { setTheme } from "./store/themeSlice.js";
+import { selectFile } from "./store/fileSlice.js";
+
 
 function App() {
   const [loading, setLoading] = useState(true); 
@@ -12,9 +15,28 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        dispatch(setTheme(savedTheme));
+      }
+    }, [dispatch]);
+
+    useEffect(() => {
+        const selectedFile = localStorage.getItem("selectedFileId");
+        if (selectedFile) {
+          dispatch(selectFile(selectedFile));
+        }
+      }, [dispatch]);
+  
+
+  useEffect(() => {
     const unsubscribe = authService.onAuthStateChanged((user) => {
       if (user) {
-        dispatch(login(user.uid)); 
+       
+        dispatch(login({
+          userId : user.uid,
+          userImgUrl : user.photoURL
+        })); 
         navigate("/ide");
       } else {
         dispatch(logout()); 

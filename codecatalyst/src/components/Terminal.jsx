@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
-import useCodeExecution from "../hooks/useCodeExecution"; 
+import useCodeExecution from "../hooks/useCodeExecution";
+import { useTheme } from "../hooks/useTheme";
 
-function Terminal({ onClose, code, language, version, shouldExecuteCode, setShouldExecuteCode }) {
+function Terminal({
+  onClose,
+  code,
+  language,
+  version,
+  shouldExecuteCode,
+  setShouldExecuteCode,
+}) {
   const [input, setInput] = useState("");
   const [file, setFile] = useState(null);
   const [inputWidth, setInputWidth] = useState(600);
   const [size, setSize] = useState({ width: window.innerWidth, height: 250 });
-
+  const { GlobalTheme } = useTheme(); 
 
   const { output, isLoading, error, executeCode } = useCodeExecution();
 
@@ -43,15 +51,56 @@ function Terminal({ onClose, code, language, version, shouldExecuteCode, setShou
     }
   }, [shouldExecuteCode]);
 
+  // Theme-based colors
+  const themeColors = {
+    dark: {
+      background: "#1E1E1E", // VS Code dark background
+      text: "#D4D4D4", // Light gray text
+      border: "#333333", // Dark border
+      inputBackground: "#252526", // Dark input background
+      outputBackground: "#1E1E1E", // Dark output background
+      buttonHover: "#2D2D2D", // Dark button hover
+      cyanText: "#4EC9B0", // VS Code cyan text
+      errorText: "#FF5555", // Red for errors
+    },
+    light: {
+      background: "#FFFFFF", // Light background
+      text: "#1F2937", // Dark text
+      border: "#E5E7EB", // Light border
+      inputBackground: "#F3F4F6", // Light input background
+      outputBackground: "#FFFFFF", // Light output background
+      buttonHover: "#E5E7EB", // Light button hover
+      cyanText: "#00ACC1", // Cyan text
+      errorText: "#FF0000", // Red for errors
+    },
+  };
+
+  const currentTheme = themeColors[GlobalTheme]; // Use GlobalTheme from Redux
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white font-mono shadow-lg border-t border-cyan-500/20">
+    <div
+      className="fixed bottom-0 left-0 right-0 font-mono shadow-lg border-t"
+      style={{
+        backgroundColor: currentTheme.background,
+        color: currentTheme.text,
+        borderColor: currentTheme.border,
+      }}
+    >
+      {/* Close Button */}
       <button
         onClick={onClose}
-        className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-700 transition-all z-40"
+        className="absolute top-2 right-2 p-1 rounded-full hover:bg-opacity-50 transition-all z-40"
+        style={{ backgroundColor: currentTheme.buttonHover }}
       >
-        <span className="material-icons text-cyan-400 hover:text-cyan-500">close</span>
+        <span
+          className="material-icons"
+          style={{ color: currentTheme.cyanText }}
+        >
+          close
+        </span>
       </button>
 
+      {/* Resizable Terminal */}
       <Resizable
         width={size.width}
         height={size.height}
@@ -61,6 +110,7 @@ function Terminal({ onClose, code, language, version, shouldExecuteCode, setShou
         resizeHandles={["n"]}
       >
         <div className="flex" style={{ width: size.width, height: size.height }}>
+          {/* Input Section */}
           <Resizable
             width={inputWidth}
             height={Infinity}
@@ -70,36 +120,82 @@ function Terminal({ onClose, code, language, version, shouldExecuteCode, setShou
             axis="x"
             resizeHandles={["e"]}
           >
-            <div style={{ width: inputWidth }} className="p-4 bg-gray-800 border-r border-cyan-500/20">
-              <h2 className="text-lg font-bold mb-4 text-cyan-400">Input</h2>
+            <div
+              className="p-4 border-r"
+              style={{
+                width: inputWidth,
+                backgroundColor: currentTheme.inputBackground,
+                borderColor: currentTheme.border,
+              }}
+            >
+              <h2
+                className="text-lg font-bold mb-4"
+                style={{ color: currentTheme.cyanText }}
+              >
+                Input
+              </h2>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Choose a file:</label>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.text }}
+                >
+                  Choose a file:
+                </label>
                 <input
                   type="file"
                   onChange={handleFileChange}
-                  className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-cyan-400 hover:file:bg-gray-600 hover:file:text-white transition-all"
+                  className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold transition-all"
+                  style={{
+                    color: currentTheme.text,
+                    backgroundColor: currentTheme.inputBackground,
+                  }}
                 />
               </div>
               <div className="flex-1 h-full">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Enter input manually:</label>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: currentTheme.text }}
+                >
+                  Enter input manually:
+                </label>
                 <textarea
                   value={input}
                   onChange={handleInputChange}
-                  className="w-full h-full bg-gray-700 p-2 rounded-md text-white outline-none resize-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
+                  className="w-full h-full p-2 rounded-md outline-none resize-none transition-all"
+                  style={{
+                    backgroundColor: currentTheme.inputBackground,
+                    color: currentTheme.text,
+                    borderColor: currentTheme.border,
+                  }}
                   placeholder="Type input here..."
                 />
               </div>
             </div>
           </Resizable>
 
-          <div style={{ width: `calc(100% - ${inputWidth}px)` }} className="p-4 bg-gray-800 overflow-y-auto">
-            <h2 className="text-lg font-bold mb-4 text-cyan-400">Output</h2>
+          {/* Output Section */}
+          <div
+            style={{ width: `calc(100% - ${inputWidth}px)`, backgroundColor: currentTheme.outputBackground }}
+            className="p-4 overflow-y-auto"
+          >
+            <h2
+              className="text-lg font-bold mb-4"
+              style={{ color: currentTheme.cyanText }}
+            >
+              Output
+            </h2>
             {isLoading ? (
-              <p className="text-gray-300">Executing code...</p>
+              <p style={{ color: currentTheme.text }}>Executing code...</p>
             ) : error ? (
-              <p className="text-red-500">{error}</p>
+              <p style={{ color: currentTheme.errorText }}>{error}</p>
             ) : (
-              <pre className="whitespace-pre-wrap text-gray-300 bg-gray-700 p-4 rounded-md">
+              <pre
+                className="whitespace-pre-wrap p-4 rounded-md"
+                style={{
+                  backgroundColor: currentTheme.inputBackground,
+                  color: currentTheme.text,
+                }}
+              >
                 {output || "Output will appear here..."}
               </pre>
             )}

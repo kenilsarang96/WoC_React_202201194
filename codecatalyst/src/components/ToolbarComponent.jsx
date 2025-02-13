@@ -20,6 +20,7 @@ import {
   TextDecrease as TextDecreaseIcon,
 } from "@mui/icons-material";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
+import { useTheme } from "../hooks/useTheme"; // Custom hook for theme
 
 const ToolbarComponent = ({
   authStatus,
@@ -38,11 +39,37 @@ const ToolbarComponent = ({
   handleLanguageChange,
   THEMES,
 }) => {
-  const themeColor = "#000000";
+  const { GlobalTheme } = useTheme(); // Access the global theme and setTheme function
+
+  // Theme-based colors
+  const themeColors = {
+    dark: {
+      appBar: "#1E1E1E", // Dark background for AppBar
+      text: "#FFFFFF", // White text
+      selectBackground: "rgba(255, 255, 255, 0.1)", // Semi-transparent white
+      slider: "#FFFFFF", // White slider
+      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red thumb
+      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red track
+    },
+    light: {
+      appBar: "#FFFFFF", // White background for AppBar
+      text: "#000000", // Black text
+      selectBackground: "rgba(0, 0, 0, 0.1)", // Semi-transparent black
+      slider: "#000000", // Black slider
+      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red thumb
+      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red track
+    },
+  };
+
+  const currentTheme = themeColors[GlobalTheme];
 
   return (
-    <AppBar position="static" sx={{ bgcolor: themeColor }}>
+    <AppBar
+      position="static"
+      sx={{ bgcolor: currentTheme.appBar, color: currentTheme.text }}
+    >
       <Toolbar>
+        {/* Left Section */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {authStatus && (
             <Tooltip title="Toggle File Bar">
@@ -68,7 +95,10 @@ const ToolbarComponent = ({
                 <Select
                   value={language}
                   onChange={(e) => handleLanguageChange(e.target.value)}
-                  sx={{ bgcolor: "rgba(255, 255, 255, 0.2)", color: "white" }}
+                  sx={{
+                    bgcolor: currentTheme.selectBackground,
+                    color: currentTheme.text,
+                  }}
                 >
                   {LANGUAGE_DATA.map((lang) => (
                     <MenuItem key={lang.language} value={lang.language}>
@@ -83,7 +113,10 @@ const ToolbarComponent = ({
             <Select
               value={theme}
               onChange={(e) => setTheme(e.target.value)}
-              sx={{ bgcolor: "rgba(255, 255, 255, 0.2)", color: "white" }}
+              sx={{
+                bgcolor: currentTheme.selectBackground,
+                color: currentTheme.text,
+              }}
             >
               {Object.keys(THEMES).map((themeName) => (
                 <MenuItem key={themeName} value={themeName}>
@@ -94,6 +127,7 @@ const ToolbarComponent = ({
           </Tooltip>
         </Box>
 
+        {/* Center Section */}
         <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", gap: 2 }}>
           <Tooltip title="Run Code">
             <Button
@@ -110,13 +144,14 @@ const ToolbarComponent = ({
           <Tooltip title="Toggle Terminal">
             <IconButton
               onClick={() => setIsTerminalVisible((prev) => !prev)}
-              sx={{ color: "#FFD700" }}
+              sx={{ color: "#FFD700" }} // Gold color for terminal icon
             >
               <TerminalIcon />
             </IconButton>
           </Tooltip>
         </Box>
 
+        {/* Right Section */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Tooltip title="Decrease Font Size">
             <IconButton color="inherit">
@@ -129,7 +164,7 @@ const ToolbarComponent = ({
             max={30}
             step={1}
             onChange={(e, newValue) => updateFontSize(newValue)}
-            sx={{ width: 100, color: "white" }}
+            sx={{ width: 100, color: currentTheme.slider }}
           />
           <Tooltip title="Increase Font Size">
             <IconButton color="inherit">
@@ -143,20 +178,20 @@ const ToolbarComponent = ({
                 onChange={() => setIsWrappingEnabled((prev) => !prev)}
                 sx={{
                   "& .MuiSwitch-thumb": {
-                    color: isWrappingEnabled ? "#4CAF50" : "#f44336",
+                    color: currentTheme.switchThumb,
                   },
                   "& .MuiSwitch-track": {
-                    backgroundColor: isWrappingEnabled ? "#4CAF50" : "#f44336",
+                    backgroundColor: currentTheme.switchTrack,
                   },
                 }}
               />
-              <Typography sx={{ color: "white" }}>Wrap</Typography>
+              <Typography sx={{ color: currentTheme.text }}>Wrap</Typography>
             </Box>
           </Tooltip>
           <Tooltip title="Download Code">
             <IconButton
               onClick={handleDownloadClick}
-              sx={{ color: "#2196F3" }}
+              sx={{ color: "#2196F3" }} // Blue color for download icon
             >
               <DownloadIcon />
             </IconButton>

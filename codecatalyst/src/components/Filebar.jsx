@@ -8,7 +8,20 @@ import {
 } from "../store/fileSlice";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
 import { fetchFiles } from "../store/fileSlice";
-
+import { ClipLoader } from "react-spinners";
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material"; // Material-UI components
+import { Add, Upload, Edit, Delete, Cancel, Check } from "@mui/icons-material"; // Material-UI icons
+import { useTheme } from "../hooks/useTheme"; // Your custom GlobalTheme hook
 
 function Filebar() {
   const dispatch = useDispatch();
@@ -16,16 +29,8 @@ function Filebar() {
   const selectedFileId = useSelector((state) => state.file.selectedFileId);
   const userId = useSelector((state) => state.auth.userId);
   const authStatus = useSelector((state) => state.auth.AuthStatus);
-  const loading = useSelector(state => state.file.loading);
-
-  useEffect(() => {
-    if (userId) {
-      console.log("hello");
-      dispatch(fetchFiles(userId));
-    }
-}, [dispatch, files.length,authStatus]);
-
-
+  const loading = useSelector((state) => state.file.loading);
+  const { GlobalTheme } = useTheme(); 
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newFileName, setNewFileName] = useState("");
@@ -37,11 +42,28 @@ function Filebar() {
   const [fileToDeleteId, setFileToDeleteId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
+  useEffect(() => {
+    
+    if (userId) {
+      dispatch(fetchFiles(userId));
+    }
+  }, [dispatch, files.length, authStatus]);
 
-  const openDialog = () => {
-    setIsDialogOpen(true);
-  };
+  useEffect(() => {
+    localStorage.setItem("selectedFileId", selectedFileId);
+  }, [selectedFileId]);
 
+    
+    useEffect(() => {
+      const selectedFile = localStorage.getItem("selectedFileId");
+      if (selectedFile) {
+        dispatch(selectFile(selectedFile));
+      }
+    }, [dispatch]);
+  
+
+
+  const openDialog = () => setIsDialogOpen(true);
   const closeDialog = () => {
     setIsDialogOpen(false);
     setNewFileName("");
@@ -111,7 +133,9 @@ function Filebar() {
         reader.readAsText(file);
         setErrorMessage("");
       } else {
-        setErrorMessage(`Files with .${fileExtension} extension are not supported.`);
+        setErrorMessage(
+          `Files with .${fileExtension} extension are not supported.`
+        );
       }
     }
   };
@@ -124,16 +148,13 @@ function Filebar() {
   const handleSaveEdit = async () => {
     if (editFileName.trim() && editingFileId) {
       try {
-        await dispatch(
-          modifyFileName(userId, editingFileId, editFileName) 
-        );
+        await dispatch(modifyFileName(userId, editingFileId, editFileName));
         closeRenameDialog();
       } catch (error) {
         console.error("Failed to rename file:", error);
       }
     }
-};
-
+  };
 
   const handleSelectFile = (id) => {
     dispatch(selectFile(id));
@@ -142,14 +163,14 @@ function Filebar() {
   const confirmDelete = async () => {
     if (fileToDeleteId) {
       try {
-        dispatch(removeFile(userId, fileToDeleteId)); 
+        dispatch(removeFile(userId, fileToDeleteId));
         setIsDeleteDialogOpen(false);
         setFileToDeleteId(null);
       } catch (error) {
         console.error("Failed to delete file:", error);
       }
     }
-};
+  };
 
   const cancelDelete = () => {
     setIsDeleteDialogOpen(false);
@@ -163,160 +184,113 @@ function Filebar() {
     return languageData ? languageData.icon : "";
   };
 
-
- 
-
   return (
-    <div className="flex flex-col bg-gray-900 text-white p-4 border-r border-cyan-500/20 h-full overflow-y-auto">
+    <div
+      className="flex flex-col p-4 h-full overflow-y-auto"
+      style={{
+        background:
+          GlobalTheme === "dark"
+            ? "linear-gradient(to bottom, #1e1e1e, #252526)"
+            : "linear-gradient(to bottom, #F9FAFB, #E5E7EB)",
+        borderRight: `1px solid ${
+          GlobalTheme === "dark" ? "#333333" : "#E5E7EB"
+        }`,
+      }}
+    >
+      
+      <Box sx={{ display: "flex", gap: 2, marginBottom: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={openDialog}
+          sx={{
+            backgroundColor: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
+            color: "white",
+            "&:hover": {
+              backgroundColor: GlobalTheme === "dark" ? "#6bd8c2" : "#2563EB",
+            },
+          }}
+        >
+          Add
+        </Button>
 
-      <button
-        onClick={openDialog}
-        className="w-full p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-md mb-4 flex items-center justify-center hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-      >
-        <span className="material-icons mr-2">add</span>
-        Add File
-      </button>
-
-      <input
-        type="file"
-        id="file-upload"
-        style={{ display: "none" }}
-        onChange={handleFileUpload}
-      />
-      <label
-        htmlFor="file-upload"
-        className="w-full p-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-md mb-4 flex items-center justify-center hover:from-green-600 hover:to-teal-700 hover:shadow-green-500/50 hover:-translate-y-1 transition-all cursor-pointer"
-      >
-        <span className="material-icons mr-2">upload</span>
-        Upload File
-      </label>
+        <input
+          type="file"
+          id="file-upload"
+          style={{ display: "none" }}
+          onChange={handleFileUpload}
+        />
+        <label htmlFor="file-upload">
+          <Button
+            variant="contained"
+            startIcon={<Upload />}
+            component="span"
+            sx={{
+              backgroundColor: GlobalTheme === "dark" ? "#10B981" : "#34D399",
+              color: "white",
+              "&:hover": {
+                backgroundColor: GlobalTheme === "dark" ? "#059669" : "#2E8B57",
+              },
+            }}
+          >
+            Upload
+          </Button>
+        </label>
+      </Box>
 
       {errorMessage && (
-        <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
+        <Typography
+          variant="body2"
+          sx={{ color: "error.main", marginBottom: 2 }}
+        >
+          {errorMessage}
+        </Typography>
       )}
 
-      {isDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-gray-900 p-6 rounded-md w-96 border border-cyan-500/20">
-            <h2 className="text-lg font-bold mb-4 text-cyan-400">
-              Create New File
-            </h2>
-            <input
-              type="text"
-              value={newFileName}
-              onChange={(e) => setNewFileName(e.target.value)}
-              placeholder="File Name"
-              className="w-full p-2 bg-gray-800 text-white rounded-md mb-4 outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            <select
-              value={newFileLanguage}
-              onChange={(e) => setNewFileLanguage(e.target.value)}
-              className="w-full p-2 bg-gray-800 text-white rounded-md mb-4 outline-none focus:ring-2 focus:ring-cyan-500"
-            >
-              {LANGUAGE_DATA.map((lang) => (
-                <option key={lang.language} value={lang.language}>
-                  {lang.language} ({lang.version})
-                </option>
-              ))}
-            </select>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={closeDialog}
-                className="p-2 bg-gray-700 text-white rounded-md flex items-center hover:bg-gray-600 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-              >
-                <span className="material-icons mr-2">cancel</span>
-                Cancel
-              </button>
-              <button
-                onClick={handleAddFile}
-                className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-md flex items-center hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-              >
-                <span className="material-icons mr-2">check</span>
-                Create
-              </button>
-            </div>
-          </div>
+      <Typography
+        variant="h6"
+        sx={{
+          color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
+          marginBottom: 2,
+        }}
+      >
+        Files
+      </Typography>
+
+
+      {loading && (
+        <div className="flex justify-center items-center p-4">
+          <ClipLoader
+            color={GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6"}
+            size={30}
+          />
         </div>
       )}
 
-      {isRenameDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-gray-900 p-6 rounded-md w-96 border border-cyan-500/20">
-            <h2 className="text-lg font-bold mb-4 text-cyan-400">
-              Rename File
-            </h2>
-            <input
-              type="text"
-              value={editFileName}
-              onChange={(e) => setEditFileName(e.target.value)}
-              placeholder="New File Name"
-              className="w-full p-2 bg-gray-800 text-white rounded-md mb-4 outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={closeRenameDialog}
-                className="p-2 bg-gray-700 text-white rounded-md flex items-center hover:bg-gray-600 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-              >
-                <span className="material-icons mr-2">cancel</span>
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-md flex items-center hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-              >
-                <span className="material-icons mr-2">check</span>
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isDeleteDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-gray-900 p-6 rounded-md w-96 border border-cyan-500/20">
-            <h2 className="text-lg font-bold mb-4 text-cyan-400">
-              Confirm Delete
-            </h2>
-            <p className="mb-4">Are you sure you want to delete this file?</p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={cancelDelete}
-                className="p-2 bg-gray-700 text-white rounded-md flex items-center hover:bg-gray-600 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-              >
-                <span className="material-icons mr-2">cancel</span>
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="p-2 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-md flex items-center hover:from-red-600 hover:to-pink-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-              >
-                <span className="material-icons mr-2">delete</span>
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div>
-        <h2 className="text-lg font-bold mb-4 text-cyan-400">Files</h2>
-
-        {loading && (<div> loading...</div>)}
-
-        {!loading &&  (<ul>
+      {!loading && (
+        <ul>
           {files.map((file) => (
             <li
               key={file.id}
-              className={`mb-2 flex items-center justify-between p-2 rounded-md ${
+              className={`mb-2 flex items-center justify-between p-2 rounded-md transition-all duration-200 ${
                 selectedFileId === file.id
-                  ? "bg-cyan-500/10"
-                  : "hover:bg-cyan-500/10"
+                  ? GlobalTheme === "dark"
+                    ? "bg-[#252526] shadow-lg scale-105"
+                    : "bg-gray-200 shadow-lg scale-105"
+                  : GlobalTheme === "dark"
+                  ? "hover:bg-[#2d2d2d] hover:scale-105"
+                  : "hover:bg-gray-100 hover:scale-105"
               }`}
             >
-              <button
+              <Button
                 onClick={() => handleSelectFile(file.id)}
-                className="text-gray-200 hover:text-cyan-400 flex items-center gap-2"
+                sx={{
+                  color: GlobalTheme === "dark" ? "#d4d4d4" : "#1F2937", 
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
               >
                 <img
                   src={getLanguageIcon(file.language)}
@@ -324,31 +298,144 @@ function Filebar() {
                   className="w-6 h-6"
                 />
                 {file.name}
-              </button>
+              </Button>
 
-             
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openRenameDialog(file.id, file.name)}
-                    className="p-1 bg-gradient-to-r from-yellow-500 to-amber-600 text-white rounded-md flex items-center hover:from-yellow-600 hover:to-amber-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-                  >
-                    <span className="material-icons">edit</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteFile(file.id)}
-                    className="p-1 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-md flex items-center hover:from-red-600 hover:to-pink-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
-                  >
-                    <span className="material-icons">delete</span>
-                  </button>
-                </div>
-                
+              <div className="flex gap-2">
+                <IconButton
+                  onClick={() => openRenameDialog(file.id, file.name)}
+                  sx={{
+                    color: GlobalTheme === "dark" ? "#d4d4d4" : "#1F2937",
+                    transition: "color 0.2s, transform 0.2s",
+                    "&:hover": {
+                      color: GlobalTheme === "dark" ? "#6bd8c2" : "#2563EB",
+                      transform: "scale(1.1)",
+                    },
+                  }}
+                >
+                  <Edit />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleDeleteFile(file.id)}
+                  sx={{
+                    color: GlobalTheme === "dark" ? "#d4d4d4" : "#1F2937",
+                    transition: "color 0.2s, transform 0.2s",
+                    "&:hover": {
+                      color: GlobalTheme === "dark" ? "#6bd8c2" : "#2563EB",
+                      transform: "scale(1.1)",
+                    },
+                  }}
+                >
+                  <Delete />
+                </IconButton>
+              </div>
             </li>
           ))}
-        </ul>)}
-      </div>
+        </ul>
+      )}
 
+
+
+      <Dialog open={isDialogOpen} onClose={closeDialog}>
+        <DialogTitle
+          sx={{
+            color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
+            fontWeight: "bold",
+            textAlign: "center",
+            padding: "16px",
+          }}
+        >
+          Create New File
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="File Name"
+            value={newFileName}
+            onChange={(e) => setNewFileName(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            fullWidth
+            select
+            label="Language"
+            value={newFileLanguage}
+            onChange={(e) => setNewFileLanguage(e.target.value)}
+            SelectProps={{ native: true }}
+          >
+            {LANGUAGE_DATA.map((lang) => (
+              <option key={lang.language} value={lang.language}>
+                {lang.language} ({lang.version})
+              </option>
+            ))}
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog} startIcon={<Cancel />}>
+            Cancel
+          </Button>
+          <Button onClick={handleAddFile} startIcon={<Check />}>
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={isRenameDialogOpen} onClose={closeRenameDialog}>
+        <DialogTitle
+          sx={{
+            color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
+            fontWeight: "bold",
+            textAlign: "center",
+            padding: "16px",
+          }}
+        >
+          Rename File
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="New File Name"
+            value={editFileName}
+            onChange={(e) => setEditFileName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeRenameDialog} startIcon={<Cancel />}>
+            Cancel
+          </Button>
+          <Button onClick={handleSaveEdit} startIcon={<Check />}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onClose={cancelDelete}>
+        <DialogTitle
+          sx={{
+            color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
+            fontWeight: "bold",
+            textAlign: "center",
+            padding: "16px",
+          }}
+        >
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this file?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelDelete} startIcon={<Cancel />}>
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} startIcon={<Delete />} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      
 
     </div>
+
   );
 }
 
