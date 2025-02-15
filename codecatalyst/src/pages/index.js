@@ -1,6 +1,6 @@
-import StartPage from "./StartPage"
-import Ide from "./Ide"
-import Login from "./Login"
-import Signup from "./Signup"
+import StartPage from "./StartPage.jsx"
+import Editor from "./Editor.jsx"
+import LoginPage from "./LoginPage.jsx"
+import SignupPage from "./SignupPage.jsx"
 
-export {StartPage,Ide,Login,Signup};
+export {StartPage,Editor,LoginPage,SignupPage};
