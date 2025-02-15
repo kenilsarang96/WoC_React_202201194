@@ -1,6 +1,6 @@
 import { getFirestore } from "firebase/firestore";
 import { app } from "../conf/conf.js";
-import { collection, addDoc, doc, updateDoc, deleteDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, deleteDoc, getDocs, query, where } from "firebase/firestore";
 import { toast } from "react-toastify"; 
 
 export class DatabaseService {
@@ -10,6 +10,7 @@ export class DatabaseService {
     constructor(){
         this.db = getFirestore(app);
     }
+
 
     async addFile(userId, file) {
         try {
@@ -23,13 +24,21 @@ export class DatabaseService {
             }
 
             const filesCollection = collection(this.db, `users/${userId}/files`);
+            const q = query(filesCollection, where("name", "==", file.name));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                toast.error(`A file with the name "${file.name}" already exists.`);
+                return null; 
+            }
+         
             const docRef = await addDoc(filesCollection, file);
-
             toast.success("File added successfully!");
             return docRef.id;
+
         } catch (error) {
-            console.error("Error adding file:", error); 
-            toast.error("Failed to add file. Please try again."); 
+            console.error("Error adding file:", error);
+            toast.error("Failed to add file. Please try again.");
             throw error;
         }
     }
@@ -37,7 +46,7 @@ export class DatabaseService {
     async updateFile(userId, fileId, updates) {
         try {
             if (!userId) {
-                toast.error("Invalid user ID. Please try again."); 
+                toast.error("Invalid user ID. Please try again.");
                 throw new Error("Invalid userId");
             }
             if (!fileId || typeof fileId !== "string") {
@@ -49,12 +58,27 @@ export class DatabaseService {
                 throw new Error("Invalid updates data");
             }
 
+            if (updates.name) {
+                const filesCollection = collection(this.db, `users/${userId}/files`);
+                const q = query(filesCollection, where("name", "==", updates.name));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const isSameFile = querySnapshot.docs.some((doc) => doc.id === fileId);
+                    if (!isSameFile) {
+                        toast.error(`A file with the name "${updates.name}" already exists.`);
+                        return false; 
+                    }
+                }
+            }
+
             const fileDoc = doc(this.db, `users/${userId}/files`, fileId);
             await updateDoc(fileDoc, updates);
-            
+            if(updates.name) toast.success("File updated successfully!");
+            return true;
         } catch (error) {
-            console.error("Error updating file:", error); 
-            toast.error("Failed to update file. Please try again."); 
+            console.error("Error updating file:", error);
+            toast.error("Failed to update file. Please try again.");
             throw error;
         }
     }
@@ -97,6 +121,33 @@ export class DatabaseService {
         } catch (error) {
             console.error("Error getting files:", error); 
             toast.error("Failed to fetch files. Please try again."); 
+            throw error;
+        }
+    }
+    async searchFilesByPrefix(userId, prefix) {
+        try {
+            if (!userId) {
+                toast.error("Invalid user ID. Please try again.");
+                throw new Error("Invalid userId");
+            }
+            if (!prefix || typeof prefix !== "string") {
+                toast.error("Invalid search prefix. Please provide a valid prefix.");
+                throw new Error("Invalid prefix");
+            }
+
+            const filesCollection = collection(this.db, `users/${userId}/files`);
+            const q = query(filesCollection, where("name", ">=", prefix), where("name", "<=", prefix + "\uf8ff"));
+            const querySnapshot = await getDocs(q);
+
+            const files = [];
+            querySnapshot.forEach((doc) => {
+                files.push({ id: doc.id, ...doc.data() });
+            });
+
+            return files;
+        } catch (error) {
+            console.error("Error searching files:", error);
+            toast.error("Failed to search files. Please try again.");
             throw error;
         }
     }

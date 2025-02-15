@@ -20,8 +20,10 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material"; // Material-UI components
-import { Add, Upload, Edit, Delete, Cancel, Check } from "@mui/icons-material"; // Material-UI icons
+import { Add, Upload, Edit, Delete, Cancel, Check,Search } from "@mui/icons-material"; // Material-UI icons
 import { useTheme } from "../hooks/useTheme"; // Your custom GlobalTheme hook
+import SearchFileDialog from "./SearchFileDialog";
+
 
 function Filebar() {
   const dispatch = useDispatch();
@@ -41,6 +43,11 @@ function Filebar() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [fileToDeleteId, setFileToDeleteId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
+
+  const openSearchDialog = () => setIsSearchDialogOpen(true);
+  const closeSearchDialog = () => setIsSearchDialogOpen(false);
+
 
   useEffect(() => {
     
@@ -236,7 +243,24 @@ function Filebar() {
             Upload
           </Button>
         </label>
+
+      <Button
+          variant="contained"
+          startIcon={<Search />} 
+          onClick={openSearchDialog}
+          sx={{
+            backgroundColor: GlobalTheme === "dark" ? "#F59E0B" : "#F59E0B",
+            color: "white",
+            "&:hover": {
+              backgroundColor: GlobalTheme === "dark" ? "#D97706" : "#D97706",
+            },
+          }}
+        >
+      </Button>
       </Box>
+
+      <SearchFileDialog open={isSearchDialogOpen} onClose={closeSearchDialog} />
+
 
       {errorMessage && (
         <Typography
@@ -360,7 +384,6 @@ function Filebar() {
             label="Language"
             value={newFileLanguage}
             onChange={(e) => setNewFileLanguage(e.target.value)}
-            SelectProps={{ native: true }}
           >
             {LANGUAGE_DATA.map((lang) => (
               <option key={lang.language} value={lang.language}>

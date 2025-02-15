@@ -69,7 +69,7 @@ export const createFile = (data) => async (dispatch) => {
     }
     try {
         const fileId = await databaseService.addFile(userId, file);
-        dispatch(addFile({ id: fileId, ...file }));
+        if(fileId != null)  dispatch(addFile({ id: fileId, ...file }));
     } catch (error) {
         console.error("Failed to create file:", error);
         throw error;
@@ -96,8 +96,8 @@ export const modifyFileCode = (userId, fileId, code) => async (dispatch) => {
 
 export const modifyFileName = (userId, fileId, name) => async (dispatch) => {
     try {
-        await databaseService.updateFile(userId, fileId, { name });
-        dispatch(updateFileName({ id: fileId, name }));
+        const modified = await databaseService.updateFile(userId, fileId, { name });
+        if(modified) dispatch(updateFileName({ id: fileId, name }));
     } catch (error) {
         console.error("Failed to update file name:", error);
     }

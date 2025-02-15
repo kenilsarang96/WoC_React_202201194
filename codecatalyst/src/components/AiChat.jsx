@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "react-resizable/css/styles.css";
-import Button from "./Button";
 import { Rnd } from "react-rnd";
 import { model } from "../conf/conf";
-import { useTheme } from "../hooks/useTheme"; // Custom hook for theme
+import { IconButton, CircularProgress } from "@mui/material";
+import { Send, Close, Chat } from "@mui/icons-material";
 
 function AiChat() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -16,38 +16,7 @@ function AiChat() {
     x: -400,
     y: -400,
   });
-
-  const { GlobalTheme } = useTheme(); // Access the global theme
-
-  // Theme-based colors
-  const themeColors = {
-    dark: {
-      background: "#1E1E1E", // Dark background
-      text: "#D4D4D4", // Light gray text
-      border: "#333333", // Dark border
-      inputBackground: "#252526", // Dark input background
-      buttonHover: "#2D2D2D", // Dark button hover
-      cyanText: "#4EC9B0", // VS Code cyan text
-      chatHeader: "bg-gradient-to-r from-cyan-800 to-blue-900", // Dark chat header
-      chatBackground: "#111827", // Dark chat background
-      userMessage: "bg-gradient-to-r from-cyan-600 to-blue-700", // User message gradient
-      aiMessage: "bg-gray-700", // AI message background
-    },
-    light: {
-      background: "#FFFFFF", // Light background
-      text: "#1F2937", // Dark text
-      border: "#E5E7EB", // Light border
-      inputBackground: "#F3F4F6", // Light input background
-      buttonHover: "#E5E7EB", // Light button hover
-      cyanText: "#00ACC1", // Cyan text
-      chatHeader: "bg-gradient-to-r from-cyan-500 to-blue-600", // Light chat header
-      chatBackground: "#F9FAFB", // Light chat background
-      userMessage: "bg-gradient-to-r from-cyan-400 to-blue-500", // User message gradient
-      aiMessage: "bg-gray-200", // AI message background
-    },
-  };
-
-  const currentTheme = themeColors[GlobalTheme]; // Use GlobalTheme from Redux
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -57,6 +26,8 @@ function AiChat() {
         { text: input, sender: "user" },
       ]);
       setInput("");
+      setIsLoading(true);
+
       try {
         const result = await model.generateContent(input);
         const response = await result.response;
@@ -72,6 +43,8 @@ function AiChat() {
           ...prevMessages,
           { text: "Sorry, something went wrong. Please try again.", sender: "ai" },
         ]);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -80,15 +53,23 @@ function AiChat() {
     setSize(size);
   };
 
+  const formatTextWithNewLines = (text) => {
+    return { __html: text.replace(/\n/g, "<br />") };
+  };
+
   return (
     <div className="fixed bottom-4 right-4">
       {!isExpanded && (
-        <Button
+        <IconButton
           onClick={() => setIsExpanded((prev) => !prev)}
-          className={`p-3 !border-0 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all`}
+          sx={{
+            backgroundColor: "primary.main",
+            color: "white",
+            "&:hover": { backgroundColor: "primary.dark" },
+          }}
         >
-          <span className="material-icons">chat</span>
-        </Button>
+          <Chat />
+        </IconButton>
       )}
 
       {isExpanded && (
@@ -111,24 +92,38 @@ function AiChat() {
               y: position.y,
             }));
           }}
+          enableResizing={{
+            bottom: true,
+            bottomRight: true,
+            bottomLeft: true,
+            left: true,
+            right: true,
+            top: true,
+            topLeft: true,
+            topRight: true,
+          }}
+          dragHandleClassName="drag-handle" // Use this class for the drag handle
+          enableUserSelectHack={true} // Allow text selection inside the chat window
         >
           <div
             style={{ width: state.width, height: state.height }}
-            className={`rounded-lg shadow-lg flex flex-col border ${currentTheme.border}`}
+            className="bg-gray-900 rounded-lg shadow-lg flex flex-col border border-cyan-500/20"
           >
             {/* Chat Header */}
-            <div className={`flex items-center justify-between p-4 ${currentTheme.chatHeader} text-white rounded-t-lg`}>
+            <div
+              className="drag-handle flex items-center justify-between p-4 bg-gradient-to-r from-cyan-800 to-blue-900 text-white rounded-t-lg cursor-move"
+            >
               <h2 className="text-lg font-semibold">AI Assistant</h2>
-              <Button
+              <IconButton
                 onClick={() => setIsExpanded((prev) => !prev)}
-                className="p-1 !border-0 rounded-full text-white hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all"
+                sx={{ color: "white" }}
               >
-                <span className="material-icons">close</span>
-              </Button>
+                <Close />
+              </IconButton>
             </div>
 
             {/* Chat Messages */}
-            <div className={`flex-1 p-4 overflow-y-auto ${currentTheme.chatBackground}`}>
+            <div className="flex-1 p-4 overflow-y-auto bg-gray-800">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -137,34 +132,51 @@ function AiChat() {
                   }`}
                 >
                   <div
-                    className={`inline-block p-2 rounded-lg ${
+                    className={`inline-block p-3 rounded-lg max-w-[80%] ${
                       message.sender === "user"
-                        ? `${currentTheme.userMessage} text-white`
-                        : `${currentTheme.aiMessage} ${currentTheme.text}`
+                        ? "bg-gradient-to-r from-cyan-600 to-blue-700 text-white"
+                        : "bg-gray-700 text-gray-200"
                     }`}
                   >
-                    {message.text}
+                    <div
+                      dangerouslySetInnerHTML={formatTextWithNewLines(message.text)}
+                    />
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="text-left mb-4">
+                  <div className="inline-block p-3 rounded-lg max-w-[80%] bg-gray-700 text-gray-200">
+                    <div className="flex items-center">
+                      <CircularProgress size={16} thickness={5} sx={{ color: "white" }} />
+                      <span className="ml-2">Thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Chat Input */}
-            <form onSubmit={handleSendMessage} className={`p-4 border-t ${currentTheme.border}`}>
+            <form onSubmit={handleSendMessage} className="p-4 border-t border-cyan-500/20">
               <div className="flex items-center">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  className={`flex-1 p-2 ${currentTheme.inputBackground} ${currentTheme.text} rounded-lg outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500`}
+                  className="flex-1 p-2 bg-gray-700 text-white rounded-lg outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500"
                   placeholder="Type a message..."
                 />
-                <Button
+                <IconButton
                   type="submit"
-                  className={`ml-2 p-2 !border-0 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50 hover:-translate-y-1 transition-all`}
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    marginLeft: "8px",
+                    "&:hover": { backgroundColor: "primary.dark" },
+                  }}
                 >
-                  <span className="material-icons">send</span>
-                </Button>
+                  <Send />
+                </IconButton>
               </div>
             </form>
           </div>

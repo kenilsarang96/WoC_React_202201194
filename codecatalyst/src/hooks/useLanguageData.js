@@ -62,7 +62,7 @@ export const useLanguageData = () => {
         } catch (error) {
           console.error("Failed to save code to Firestore:", error);
         }
-      }, 5000);
+      }, 3000);
     }
   };
 

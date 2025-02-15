@@ -6,6 +6,8 @@ import { aura, auraInit } from '@uiw/codemirror-theme-aura';
 import { githubLight, githubLightInit, githubDark, githubDarkInit } from '@uiw/codemirror-theme-github';
 import { vscodeDark, vscodeDarkInit } from '@uiw/codemirror-theme-vscode';
 import { vscodeLight, vscodeLightInit } from '@uiw/codemirror-theme-vscode';
+import { red } from '@uiw/codemirror-theme-red';
+import { sublime, sublimeInit } from '@uiw/codemirror-theme-sublime';
 
 
 export const THEMES = {
@@ -16,6 +18,8 @@ export const THEMES = {
   xcodeDark,
   solarizedDark,
   vscodeDark,
+  sublime,
+  red,
   vscodeLight,
   xcodeLight,
   githubLight,

@@ -26,7 +26,7 @@ function Ide() {
   const [isWrappingEnabled, setIsWrappingEnabled] = useState(false);
   const [isTerminalVisible, setIsTerminalVisible] = useState(false);
   const [isFileBarVisible, setIsFileBarVisible] = useState(true);
-  const [fileBarWidth, setFileBarWidth] = useState(300);
+  const [fileBarWidth, setFileBarWidth] = useState(330);
   const [fontSize, setFontSize] = useState(() => {
     const savedFontSize = localStorage.getItem("editorFontSize");
     return savedFontSize ? parseInt(savedFontSize, 10) : 14;
@@ -108,7 +108,7 @@ function Ide() {
 
   return (
     <div className="flex flex-col h-screen">
-      <div ref={headerRef} className="fixed top-0 left-0 w-full z-50">
+      <div ref={headerRef} className="fixed top-0 left-0 w-full z-40">
         <Header />
       </div>
 
@@ -239,7 +239,7 @@ function Ide() {
                     autocompletion(),
                     isWrappingEnabled ? EditorView.lineWrapping : [],
                   ]}
-                  theme={getTheme(GlobalTheme)} // Apply the theme to CodeMirror
+                  theme={getTheme(theme)} 
                   height="100%"
                   width="100%"
                   onChange={handleEditorChange}

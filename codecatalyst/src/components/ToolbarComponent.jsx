@@ -39,7 +39,7 @@ const ToolbarComponent = ({
   handleLanguageChange,
   THEMES,
 }) => {
-  const { GlobalTheme } = useTheme(); // Access the global theme and setTheme function
+  const { GlobalTheme } = useTheme(); 
 
   // Theme-based colors
   const themeColors = {
