@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import "react-resizable/css/styles.css";
 import { Rnd } from "react-rnd";
 import { model } from "../conf/conf";
 import { IconButton, CircularProgress } from "@mui/material";
 import { Send, Close, Chat } from "@mui/icons-material";
 
-function AiChat() {
+const AiChat = memo(() => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -18,7 +18,7 @@ function AiChat() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = useCallback(async (e) => {
     e.preventDefault();
     if (input.trim()) {
       setMessages((prevMessages) => [
@@ -47,11 +47,11 @@ function AiChat() {
         setIsLoading(false);
       }
     }
-  };
+  }, [input]);
 
-  const onResize = (event, { size }) => {
+  const onResize = useCallback((event, { size }) => {
     setSize(size);
-  };
+  }, []);
 
   const formatTextWithNewLines = (text) => {
     return { __html: text.replace(/\n/g, "<br />") };
@@ -102,8 +102,8 @@ function AiChat() {
             topLeft: true,
             topRight: true,
           }}
-          dragHandleClassName="drag-handle" // Use this class for the drag handle
-          enableUserSelectHack={true} // Allow text selection inside the chat window
+          dragHandleClassName="drag-handle" 
+          enableUserSelectHack={true} 
         >
           <div
             style={{ width: state.width, height: state.height }}
@@ -184,6 +184,6 @@ function AiChat() {
       )}
     </div>
   );
-}
+});
 
 export default AiChat;

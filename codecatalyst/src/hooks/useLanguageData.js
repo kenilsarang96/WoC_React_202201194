@@ -58,7 +58,6 @@ export const useLanguageData = () => {
       saveTimeoutRef.current = setTimeout(() => {
         try {
           dispatch(modifyFileCode(userId, selectedFile.id, newCode));
-          console.log("Code saved to Firestore.");
         } catch (error) {
           console.error("Failed to save code to Firestore:", error);
         }

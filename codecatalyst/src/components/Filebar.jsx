@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   createFile,
@@ -19,13 +19,14 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "@mui/material"; // Material-UI components
-import { Add, Upload, Edit, Delete, Cancel, Check,Search } from "@mui/icons-material"; // Material-UI icons
-import { useTheme } from "../hooks/useTheme"; // Your custom GlobalTheme hook
+  MenuItem 
+} from "@mui/material"; 
+import { Add, Upload, Edit, Delete, Cancel, Check,Search } from "@mui/icons-material"; 
+import { useTheme } from "../hooks/useTheme"; 
 import SearchFileDialog from "./SearchFileDialog";
 
 
-function Filebar() {
+const Filebar = () => {
   const dispatch = useDispatch();
   const files = useSelector((state) => state.file.files);
   const selectedFileId = useSelector((state) => state.file.selectedFileId);
@@ -45,8 +46,8 @@ function Filebar() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
-  const openSearchDialog = () => setIsSearchDialogOpen(true);
-  const closeSearchDialog = () => setIsSearchDialogOpen(false);
+  const openSearchDialog = useCallback(() => setIsSearchDialogOpen(true), []);
+  const closeSearchDialog = useCallback(() => setIsSearchDialogOpen(false), []);
 
 
   useEffect(() => {
@@ -70,24 +71,24 @@ function Filebar() {
   
 
 
-  const openDialog = () => setIsDialogOpen(true);
-  const closeDialog = () => {
+  const openDialog = useCallback(() => setIsDialogOpen(true), []);
+  const closeDialog = useCallback(() => {
     setIsDialogOpen(false);
     setNewFileName("");
     setNewFileLanguage("javascript");
-  };
+  }, []);
 
-  const openRenameDialog = (id, name) => {
+  const openRenameDialog = useCallback((id, name) => {
     setEditingFileId(id);
     setEditFileName(name);
     setIsRenameDialogOpen(true);
-  };
+  }, []);
 
-  const closeRenameDialog = () => {
+  const closeRenameDialog = useCallback(() => {
     setIsRenameDialogOpen(false);
     setEditingFileId(null);
     setEditFileName("");
-  };
+  }, []);
 
   const getCodeSnippet = (language) => {
     const languageData = LANGUAGE_DATA.find(
@@ -96,7 +97,7 @@ function Filebar() {
     return languageData ? languageData.codeSnippet : "";
   };
 
-  const handleAddFile = async () => {
+  const handleAddFile = useCallback(async () => {
     if (newFileName.trim()) {
       const newFile = {
         name: newFileName.trim(),
@@ -110,9 +111,9 @@ function Filebar() {
         console.error("Failed to create file:", error);
       }
     }
-  };
+  }, [newFileName, newFileLanguage, userId, dispatch, closeDialog]);
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = useCallback((event) => {
     const file = event.target.files[0];
     if (file) {
       const fileName = file.name;
@@ -145,14 +146,14 @@ function Filebar() {
         );
       }
     }
-  };
+  }, [dispatch, userId]);
 
-  const handleDeleteFile = (id) => {
+  const handleDeleteFile = useCallback((id) => {
     setFileToDeleteId(id);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = useCallback(async () => {
     if (editFileName.trim() && editingFileId) {
       try {
         await dispatch(modifyFileName(userId, editingFileId, editFileName));
@@ -161,13 +162,13 @@ function Filebar() {
         console.error("Failed to rename file:", error);
       }
     }
-  };
+  }, [editFileName, editingFileId, userId, dispatch, closeRenameDialog]);
 
-  const handleSelectFile = (id) => {
+  const handleSelectFile = useCallback((id) => {
     dispatch(selectFile(id));
-  };
+  }, [dispatch]);
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (fileToDeleteId) {
       try {
         dispatch(removeFile(userId, fileToDeleteId));
@@ -177,12 +178,12 @@ function Filebar() {
         console.error("Failed to delete file:", error);
       }
     }
-  };
+  }, [fileToDeleteId, userId, dispatch]);
 
-  const cancelDelete = () => {
+  const cancelDelete = useCallback(() => {
     setIsDeleteDialogOpen(false);
     setFileToDeleteId(null);
-  };
+  }, []);
 
   const getLanguageIcon = (language) => {
     const languageData = LANGUAGE_DATA.find(
@@ -359,48 +360,49 @@ function Filebar() {
 
 
 
-      <Dialog open={isDialogOpen} onClose={closeDialog}>
-        <DialogTitle
-          sx={{
-            color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
-            fontWeight: "bold",
-            textAlign: "center",
-            padding: "16px",
-          }}
-        >
-          Create New File
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="File Name"
-            value={newFileName}
-            onChange={(e) => setNewFileName(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            fullWidth
-            select
-            label="Language"
-            value={newFileLanguage}
-            onChange={(e) => setNewFileLanguage(e.target.value)}
-          >
-            {LANGUAGE_DATA.map((lang) => (
-              <option key={lang.language} value={lang.language}>
-                {lang.language} ({lang.version})
-              </option>
-            ))}
-          </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDialog} startIcon={<Cancel />}>
-            Cancel
-          </Button>
-          <Button onClick={handleAddFile} startIcon={<Check />}>
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
+<Dialog open={isDialogOpen} onClose={closeDialog}>
+  <DialogTitle
+    sx={{
+      color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
+      fontWeight: "bold",
+      textAlign: "center",
+      padding: "16px",
+    }}
+  >
+    Create New File
+  </DialogTitle>
+  <DialogContent>
+    <TextField
+      fullWidth
+      label="File Name"
+      value={newFileName}
+      onChange={(e) => setNewFileName(e.target.value)}
+      sx={{ marginBottom: 2 }}
+    />
+    <TextField
+      fullWidth
+      select
+      label="Language"
+      value={newFileLanguage}
+      onChange={(e) => setNewFileLanguage(e.target.value)}
+      sx={{ marginBottom: 2 }}
+    >
+      {LANGUAGE_DATA.map((lang) => (
+        <MenuItem key={lang.language} value={lang.language}>
+          {lang.language} ({lang.version})
+        </MenuItem>
+      ))}
+    </TextField>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={closeDialog} startIcon={<Cancel />}>
+      Cancel
+    </Button>
+    <Button onClick={handleAddFile} startIcon={<Check />}>
+      Create
+    </Button>
+  </DialogActions>
+</Dialog>
 
       <Dialog open={isRenameDialogOpen} onClose={closeRenameDialog}>
         <DialogTitle
@@ -462,4 +464,4 @@ function Filebar() {
   );
 }
 
-export default Filebar;
+export default memo(Filebar);

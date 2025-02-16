@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { useSelector,useDispatch } from "react-redux";
 import {
   Dialog,
@@ -16,7 +16,7 @@ import databaseService from "../firebase/db";
 import { selectFile } from "../store/fileSlice";
 
 
-function SearchFileDialog({ open, onClose }) {
+const SearchFileDialog = ({ open, onClose }) => {
   const dispatch = useDispatch(); 
   const userId = useSelector((state) => state.auth.userId);
   const [searchPrefix, setSearchPrefix] = useState("");
@@ -50,10 +50,10 @@ function SearchFileDialog({ open, onClose }) {
     return () => clearTimeout(debounceTimer); 
   }, [searchPrefix, userId]);
 
-  const handleFileClick = (fileId) => {
+  const handleFileClick = useCallback((fileId) => {
     dispatch(selectFile(fileId)); 
     onClose();
-  };
+  }, [dispatch, onClose]);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -93,4 +93,4 @@ function SearchFileDialog({ open, onClose }) {
   );
 }
 
-export default SearchFileDialog;
+export default memo(SearchFileDialog);

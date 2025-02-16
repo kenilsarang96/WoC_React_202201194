@@ -4,9 +4,9 @@ import authService from "../firebase/auth";
 import { useDispatch } from "react-redux";
 import { login } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../hooks/useTheme"; // Custom hook for GlobalTheme
-import { Button, Typography } from "@mui/material"; // Material-UI components
-import { Google as GoogleIcon } from "@mui/icons-material"; // Material-UI Google icon
+import { useTheme } from "../hooks/useTheme"; 
+import { Button, Typography } from "@mui/material"; 
+import { Google as GoogleIcon } from "@mui/icons-material";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -14,7 +14,7 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { GlobalTheme } = useTheme(); // Access the global GlobalTheme
+  const { GlobalTheme } = useTheme(); 
 
   const signinHandler = async (email, password) => {
     try {
@@ -71,14 +71,14 @@ function Login() {
   return (
     <div
       className={`min-h-screen flex items-center justify-center ${
-        GlobalTheme === "dark" ? "bg-[#1e1e1e]" : "bg-gray-100" // VS Code dark background
+        GlobalTheme === "dark" ? "bg-[#1e1e1e]" : "bg-gray-100"
       }`}
     >
       <div
         className={`p-8 rounded-lg shadow-lg w-full max-w-md border ${
           GlobalTheme === "dark"
             ? "bg-[#252526] border-[#333333]"
-            : "bg-white border-gray-200" // VS Code dark card background
+            : "bg-white border-gray-200" 
         }`}
       >
         {/* Logo and Brand Name */}
@@ -88,7 +88,7 @@ function Login() {
             variant="h4"
             className={`font-bold bg-clip-text ${
               GlobalTheme === "dark"
-                ? "text-transparent bg-gradient-to-r from-cyan-400 to-blue-500" // VS Code cyan gradient
+                ? "text-transparent bg-gradient-to-r from-cyan-400 to-blue-500" 
                 : "text-transparent bg-gradient-to-r from-cyan-600 to-blue-700"
             }`}
           >
@@ -100,7 +100,7 @@ function Login() {
         <Typography
           variant="h5"
           className={`text-center mt-3 ${
-            GlobalTheme === "dark" ? "text-[#d4d4d4]" : "text-gray-900" // VS Code light gray text
+            GlobalTheme === "dark" ? "text-[#d4d4d4]" : "text-gray-900" 
           }`}
         >
           Login
@@ -111,7 +111,7 @@ function Login() {
           <div
             className={`mb-4 p-3 rounded-md ${
               GlobalTheme === "dark"
-                ? "bg-[#2d2d2d] border border-[#ff5555]/50 text-[#ff5555]" // VS Code error colors
+                ? "bg-[#2d2d2d] border border-[#ff5555]/50 text-[#ff5555]" 
                 : "bg-red-100 border border-red-300 text-red-700"
             }`}
           >
@@ -144,7 +144,7 @@ function Login() {
               type="email"
               className={`mt-1 block w-full px-3 py-2 rounded-md outline-none focus:ring-2 ${
                 GlobalTheme === "dark"
-                  ? "bg-[#333333] text-[#d4d4d4] focus:ring-cyan-500 focus:border-cyan-500" // VS Code input background
+                  ? "bg-[#333333] text-[#d4d4d4] focus:ring-cyan-500 focus:border-cyan-500" 
                   : "bg-gray-100 text-gray-900 focus:ring-cyan-600 focus:border-cyan-600"
               }`}
               placeholder="Enter your email"
@@ -158,7 +158,7 @@ function Login() {
               variant="body1"
               className={`${
                 GlobalTheme === "dark" ? "text-[#d4d4d4]" : "text-gray-700"
-              }`} // VS Code light gray text
+              }`} 
             >
               Password
             </Typography>
@@ -170,7 +170,7 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               className={`mt-1 block w-full px-3 py-2 rounded-md outline-none focus:ring-2 ${
                 GlobalTheme === "dark"
-                  ? "bg-[#333333] text-[#d4d4d4] focus:ring-cyan-500 focus:border-cyan-500" // VS Code input background
+                  ? "bg-[#333333] text-[#d4d4d4] focus:ring-cyan-500 focus:border-cyan-500" 
                   : "bg-gray-100 text-gray-900 focus:ring-cyan-600 focus:border-cyan-600"
               }`}
               placeholder="Enter your password"
@@ -185,7 +185,7 @@ function Login() {
             fullWidth
             className={`mt-4 ${
               GlobalTheme === "dark"
-                ? "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700" // VS Code cyan gradient
+                ? "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
                 : "bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-700 hover:to-blue-800"
             }`}
           >
@@ -204,7 +204,7 @@ function Login() {
             variant="body2"
             className={`px-2 ${
               GlobalTheme === "dark" ? "text-[#a9a9a9]" : "text-gray-500"
-            }`} // VS Code light gray text
+            }`} 
           >
             or
           </Typography>
@@ -223,11 +223,11 @@ function Login() {
           startIcon={<GoogleIcon />}
           className={`mt-6 transition-all duration-300 ${
             GlobalTheme === "dark"
-              ? "bg-white text-gray-900 hover:bg-gray-100 hover:shadow-lg" // Light background for dark theme
-              : "bg-[#4285F4] text-white hover:bg-[#357ABD] hover:shadow-lg" // Google blue for light theme
+              ? "bg-white text-gray-900 hover:bg-gray-100 hover:shadow-lg" 
+              : "bg-[#4285F4] text-white hover:bg-[#357ABD] hover:shadow-lg" 
           }`}
           style={{
-            background: GlobalTheme === "dark" ? "white" : "#4285F4", // Google blue
+            background: GlobalTheme === "dark" ? "white" : "#4285F4", 
             color: GlobalTheme === "dark" ? "black" : "white",
             border: GlobalTheme === "dark" ? "1px solid #333333" : "none",
             boxShadow:
@@ -243,7 +243,7 @@ function Login() {
             variant="body2"
             className={`${
               GlobalTheme === "dark" ? "text-[#a9a9a9]" : "text-gray-600"
-            }`} // VS Code light gray text
+            }`} 
           >
             Don't have an account?{" "}
             <Button
@@ -251,7 +251,7 @@ function Login() {
               variant="text"
               className={`${
                 GlobalTheme === "dark"
-                  ? "text-cyan-400 hover:text-cyan-300" // VS Code cyan text
+                  ? "text-cyan-400 hover:text-cyan-300"
                   : "text-cyan-600 hover:text-cyan-700"
               }`}
             >

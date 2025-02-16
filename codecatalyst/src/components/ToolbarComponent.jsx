@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import {
   AppBar,
   Toolbar,
@@ -63,6 +63,22 @@ const ToolbarComponent = ({
 
   const currentTheme = themeColors[GlobalTheme];
 
+  const handleFileBarToggle = useCallback(() => {
+    setIsFileBarVisible((prev) => !prev);
+  }, [setIsFileBarVisible]);
+
+  const handleTerminalToggle = useCallback(() => {
+    setIsTerminalVisible((prev) => !prev);
+  }, [setIsTerminalVisible]);
+
+  const handleFontSizeChange = useCallback((e, newValue) => {
+    updateFontSize(newValue);
+  }, [updateFontSize]);
+
+  const handleWrappingToggle = useCallback(() => {
+    setIsWrappingEnabled((prev) => !prev);
+  }, [setIsWrappingEnabled]);
+
   return (
     <AppBar
       position="static"
@@ -74,7 +90,7 @@ const ToolbarComponent = ({
           {authStatus && (
             <Tooltip title="Toggle File Bar">
               <IconButton
-                onClick={() => setIsFileBarVisible((prev) => !prev)}
+                onClick={handleFileBarToggle}
                 color="inherit"
                 edge="start"
               >
@@ -143,7 +159,7 @@ const ToolbarComponent = ({
           </Tooltip>
           <Tooltip title="Toggle Terminal">
             <IconButton
-              onClick={() => setIsTerminalVisible((prev) => !prev)}
+              onClick={handleTerminalToggle}
               sx={{ color: "#FFD700" }} // Gold color for terminal icon
             >
               <TerminalIcon />
@@ -163,7 +179,7 @@ const ToolbarComponent = ({
             min={10}
             max={30}
             step={1}
-            onChange={(e, newValue) => updateFontSize(newValue)}
+            onChange={handleFontSizeChange}
             sx={{ width: 100, color: currentTheme.slider }}
           />
           <Tooltip title="Increase Font Size">
@@ -175,7 +191,7 @@ const ToolbarComponent = ({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Switch
                 checked={isWrappingEnabled}
-                onChange={() => setIsWrappingEnabled((prev) => !prev)}
+                onChange={handleWrappingToggle}
                 sx={{
                   "& .MuiSwitch-thumb": {
                     color: currentTheme.switchThumb,
@@ -202,4 +218,4 @@ const ToolbarComponent = ({
   );
 };
 
-export default ToolbarComponent;
+export default memo(ToolbarComponent);

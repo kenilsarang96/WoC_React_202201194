@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useTheme } from '../hooks/useTheme'; // Custom hook for GlobalTheme
+import { useTheme } from '../hooks/useTheme';
 
 const UpcomingContestsPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,7 +8,7 @@ const UpcomingContestsPopup = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [ongoingContest, setOngoingContest] = useState(null);
-  const { GlobalTheme } = useTheme(); // Access the global theme
+  const { GlobalTheme } = useTheme(); 
 
   const isToday = (date) => {
     const today = new Date();
@@ -98,8 +98,8 @@ const UpcomingContestsPopup = () => {
         onClick={togglePopup}
         className={`${
           ongoingContest
-            ? 'bg-green-600 hover:bg-green-700 animate-pulse' // Green for ongoing contest
-            : 'bg-cyan-600 hover:bg-cyan-700' // Cyan for upcoming contests
+            ? 'bg-green-600 hover:bg-green-700 animate-pulse'
+            : 'bg-cyan-600 hover:bg-cyan-700' 
         } text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-cyan-500/50 transition-all`}
         style={{
           backgroundColor: currentTheme.buttonBackground,

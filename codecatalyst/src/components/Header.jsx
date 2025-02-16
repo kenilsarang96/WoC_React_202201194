@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../store/authSlice";
@@ -20,7 +20,7 @@ import Logo from "./Logo";
 import { useTheme } from "../hooks/useTheme";
 import { red } from "@mui/material/colors";
 
-function Header({ className = "" }) {
+const Header = ({ className = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -32,15 +32,15 @@ function Header({ className = "" }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const handleProfileClick = (event) => {
+  const handleProfileClick = useCallback((event) => {
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const logoutHandler = () => {
+  const logoutHandler = useCallback(() => {
     authService
       .logoutHandler()
       .then(() => {
@@ -48,7 +48,7 @@ function Header({ className = "" }) {
         navigate("/");
       })
       .catch((error) => console.error(error));
-  };
+  }, [dispatch, navigate]);
 
   const vsCodeDarkTheme = {
     background: "#1E1E1E", // Dark background
@@ -267,4 +267,4 @@ function Header({ className = "" }) {
   );
 }
 
-export default Header;
+export default memo(Header);

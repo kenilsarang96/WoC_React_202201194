@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-function AuthLayout({ children, authRequired = true }) {
+const AuthLayout = ({ children, authRequired = true }) => {
   const navigate = useNavigate();
   const [loader, setLoader] = useState(true);
   const authStatus = useSelector((state) => state.auth.AuthStatus);
@@ -19,6 +19,6 @@ function AuthLayout({ children, authRequired = true }) {
   ) : (
     <>{children}</>
   );
-}
+};
 
-export default AuthLayout;
+export default memo(AuthLayout);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback, memo } from "react";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
 import CodeMirror from "@uiw/react-codemirror";
@@ -21,7 +21,7 @@ import Toolbar from "./ToolbarComponent";
 import Header from "./Header";
 import {useTheme} from "../hooks/useTheme";
 
-function Ide() {
+const Ide = () => {
   const [theme, setTheme] = useState("oneDark");
   const [isWrappingEnabled, setIsWrappingEnabled] = useState(false);
   const [isTerminalVisible, setIsTerminalVisible] = useState(false);
@@ -67,9 +67,9 @@ function Ide() {
     handleLanguageChange,
   } = useLanguageData();
 
-  const onResize = (event, { size }) => {
+  const onResize = useCallback((event, { size }) => {
     setFileBarWidth(size.width);
-  };
+  }, []);
 
   const getLanguageExtension = () => {
     switch (language) {
@@ -82,29 +82,29 @@ function Ide() {
     }
   };
 
-  const handleEditorChange = (value) => {
+  const handleEditorChange = useCallback((value) => {
     setCode(value);
-  };
+  }, [setCode]);
 
-  const handleDownloadClick = () => {
+  const handleDownloadClick = useCallback(() => {
     if (authStatus && selectedFile) {
       handleDownload(code, language, selectedFile.name);
     } else {
       handleDownload(code, language);
     }
-  };
+  }, [authStatus, selectedFile, code, language]);
 
-  const updateFontSize = (newSize) => {
+  const updateFontSize = useCallback((newSize) => {
     setFontSize(newSize);
     localStorage.setItem("editorFontSize", newSize.toString());
-  };
+  }, []);
 
-  const handleRunCode = () => {
+  const handleRunCode = useCallback(() => {
     if (!isTerminalVisible) {
       setIsTerminalVisible(true);
     }
     setShouldExecuteCode(true);
-  };
+  }, [isTerminalVisible]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -268,6 +268,6 @@ function Ide() {
       <AiChat />
     </div>
   );
-}
+};
 
-export default Ide;
+export default memo(Ide);

@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
 import useCodeExecution from "../hooks/useCodeExecution";
 import { useTheme } from "../hooks/useTheme";
 
-function Terminal({
+const Terminal = ({
   onClose,
   code,
   language,
   version,
   shouldExecuteCode,
   setShouldExecuteCode,
-}) {
+}) => {
   const [input, setInput] = useState("");
   const [file, setFile] = useState(null);
   const [inputWidth, setInputWidth] = useState(600);
@@ -20,11 +20,11 @@ function Terminal({
 
   const { output, isLoading, error, executeCode } = useCodeExecution();
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     setInput(e.target.value);
-  };
+  }, []);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = useCallback((e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
@@ -34,15 +34,15 @@ function Terminal({
       };
       reader.readAsText(selectedFile);
     }
-  };
+  }, []);
 
-  const onResize = (event, { size }) => {
+  const onResize = useCallback((event, { size }) => {
     setInputWidth(size.width);
-  };
+  }, []);
 
-  const onResizeMain = (event, { size }) => {
+  const onResizeMain = useCallback((event, { size }) => {
     setSize(size);
-  };
+  }, []);
 
   useEffect(() => {
     if (shouldExecuteCode) {
@@ -75,8 +75,7 @@ function Terminal({
     },
   };
 
-  const currentTheme = themeColors[GlobalTheme]; // Use GlobalTheme from Redux
-
+  const currentTheme = themeColors[GlobalTheme];
   return (
     <div
       className="fixed bottom-0 left-0 right-0 font-mono shadow-lg border-t"
@@ -206,4 +205,4 @@ function Terminal({
   );
 }
 
-export default Terminal;
+export default memo(Terminal);

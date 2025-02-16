@@ -5,7 +5,7 @@ import App from './App.jsx'
 import { Provider } from 'react-redux'
 import store from "./store/store.js"
 import { RouterProvider,createBrowserRouter } from 'react-router-dom'
-import {StartPage,LoginPage,SignupPage,Editor} from "./pages"
+import {StartPage,LoginPage,SignupPage,Editor,NotFoundPage} from "./pages"
 import {AuthLayout} from "./components"
 
 const router = createBrowserRouter([
@@ -52,6 +52,10 @@ const router = createBrowserRouter([
              <Editor/>
           </AuthLayout>
         )
+      },
+      {
+        path: "*", 
+        element: <NotFoundPage />
       }
     ]
   }

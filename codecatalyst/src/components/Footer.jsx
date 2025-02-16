@@ -1,8 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import { FaGithub } from "react-icons/fa";
 import { useTheme } from "../hooks/useTheme"; 
 
-function Footer() {
+const Footer = () => {
   const { GlobalTheme } = useTheme(); 
 
   return (
@@ -15,7 +15,7 @@ function Footer() {
         color: GlobalTheme === "dark" ? "#d4d4d4" : "#333",
         borderTop: GlobalTheme === "dark" ? "1px solid #333" : "1px solid #ccc",
         backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)", // For Safari
+        WebkitBackdropFilter: "blur(10px)", 
       }}
     >
       <div className="container mx-auto px-4">
@@ -53,4 +53,4 @@ function Footer() {
   );
 }
 
-export default Footer;
+export default memo(Footer);

@@ -1,8 +1,8 @@
-import React from 'react';
-import { useTheme } from '../hooks/useTheme'; // Custom hook for GlobalTheme
+import React, { memo } from 'react';
+import { useTheme } from '../hooks/useTheme';
 
-function Card({ title, description, icon }) {
-  const { GlobalTheme } = useTheme(); // Access the global theme
+const Card = ({ title, description, icon }) => {
+  const { GlobalTheme } = useTheme(); 
 
   return (
     <div
@@ -12,7 +12,7 @@ function Card({ title, description, icon }) {
           ? 'linear-gradient(135deg, rgba(30,30,30,0.85), rgba(50,50,50,0.85))'
           : 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9))',
         backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)", // For Safari
+        WebkitBackdropFilter: "blur(12px)", 
         border: GlobalTheme === 'dark' ? '1px solid #333' : '1px solid #ddd',
         color: GlobalTheme === 'dark' ? '#ffffff' : '#333',
         boxShadow: GlobalTheme === 'dark' 
@@ -39,6 +39,6 @@ function Card({ title, description, icon }) {
       <p className="mt-3 text-center text-sm opacity-80">{description}</p>
     </div>
   );
-}
+};
 
-export default Card;
+export default memo(Card);

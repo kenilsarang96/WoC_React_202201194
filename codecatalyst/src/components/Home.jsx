@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import UpcomingContestsPopup from "./UpcomingContestsPopup";
 import { useTheme } from "../hooks/useTheme";
-import { motion, AnimatePresence } from "framer-motion"; // Import framer-motion
+import { motion, AnimatePresence } from "framer-motion"; 
 
 function Home() {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ function Home() {
     {
       title: "Multiple Themes",
       description:
-        "Switch between dark, light, and custom GlobalThemes for a personalized experience.",
+        "Switch between differenet themes for a personalized experience.",
       icon: "🎨",
     },
     {
@@ -31,7 +31,7 @@ function Home() {
     },
     {
       title: "Integrated Terminal",
-      description: "Run commands and debug your code with a built-in terminal.",
+      description: "debug your code with a built-in terminal.",
       icon: "💻",
     },
     {
@@ -42,7 +42,7 @@ function Home() {
     },
     {
       title: "Rich Editor",
-      description: "Enjoy syntax highlighting, auto-completion, and more.",
+      description: "Enjoy syntax highlighting, word-wrap, themes, and more.",
       icon: "✍️",
     },
     {
@@ -59,7 +59,6 @@ function Home() {
     },
   ];
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
