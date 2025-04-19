@@ -1,26 +1,25 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useState } from "react";
 import {
   AppBar,
   Toolbar,
   IconButton,
   MenuItem,
   Select,
-  Slider,
-  Typography,
-  Switch,
   Button,
   Box,
   Tooltip,
+  CircularProgress,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   Terminal as TerminalIcon,
   Download as DownloadIcon,
-  TextIncrease as TextIncreaseIcon,
-  TextDecrease as TextDecreaseIcon,
+  Settings as SettingsIcon,
 } from "@mui/icons-material";
 import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
-import { useTheme } from "../hooks/useTheme"; // Custom hook for theme
+import { useTheme } from "../hooks/useTheme";
+import SettingsPopup from "./SettingsPopup";
+import { useSelector } from "react-redux";
 
 const ToolbarComponent = ({
   authStatus,
@@ -37,27 +36,29 @@ const ToolbarComponent = ({
   selectedLanguageData,
   language,
   handleLanguageChange,
-  THEMES,
+  THEMES = {}, // Default empty object if undefined
 }) => {
-  const { GlobalTheme } = useTheme(); 
+  const { GlobalTheme } = useTheme();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  // const [isRunning, setIsRunning] = useState(false);
+  const isExecuting = useSelector((state) => state.execution.isExecuting);
 
-  // Theme-based colors
   const themeColors = {
     dark: {
-      appBar: "#1E1E1E", // Dark background for AppBar
-      text: "#FFFFFF", // White text
-      selectBackground: "rgba(255, 255, 255, 0.1)", // Semi-transparent white
-      slider: "#FFFFFF", // White slider
-      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red thumb
-      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red track
+      appBar: "#1E1E1E",
+      text: "#FFFFFF",
+      selectBackground: "rgba(255, 255, 255, 0.1)",
+      slider: "#FFFFFF",
+      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336",
+      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336",
     },
     light: {
-      appBar: "#FFFFFF", // White background for AppBar
-      text: "#000000", // Black text
-      selectBackground: "rgba(0, 0, 0, 0.1)", // Semi-transparent black
-      slider: "#000000", // Black slider
-      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red thumb
-      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336", // Green or red track
+      appBar: "#FFFFFF",
+      text: "#000000",
+      selectBackground: "rgba(0, 0, 0, 0.1)",
+      slider: "#000000",
+      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336",
+      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336",
     },
   };
 
@@ -71,150 +72,157 @@ const ToolbarComponent = ({
     setIsTerminalVisible((prev) => !prev);
   }, [setIsTerminalVisible]);
 
-  const handleFontSizeChange = useCallback((e, newValue) => {
-    updateFontSize(newValue);
-  }, [updateFontSize]);
+  const handleSettingsOpen = () => {
+    setSettingsOpen(true);
+  };
 
-  const handleWrappingToggle = useCallback(() => {
-    setIsWrappingEnabled((prev) => !prev);
-  }, [setIsWrappingEnabled]);
+  const handleSettingsClose = () => {
+    setSettingsOpen(false);
+  };
+
+
 
   return (
-    <AppBar
-      position="static"
-      sx={{ bgcolor: currentTheme.appBar, color: currentTheme.text }}
-    >
-      <Toolbar>
-        {/* Left Section */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {authStatus && (
-            <Tooltip title="Toggle File Bar">
-              <IconButton
-                onClick={handleFileBarToggle}
-                color="inherit"
-                edge="start"
-              >
-                <MenuIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          {!authStatus && (
-            <>
-              {selectedLanguageData && (
-                <img
-                  src={selectedLanguageData.icon}
-                  alt={`${selectedLanguageData.language} logo`}
-                  className="w-6 h-6"
-                />
-              )}
-              <Tooltip title="Select Language">
+    <>
+      <AppBar
+        position="static"
+        sx={{ bgcolor: currentTheme.appBar, color: currentTheme.text }}
+      >
+        <Toolbar>
+          {/* Left Section */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {authStatus && (
+              <Tooltip title="Toggle File Bar">
+                <IconButton
+                  onClick={handleFileBarToggle}
+                  color="inherit"
+                  edge="start"
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {!authStatus && (
+              <>
+                {selectedLanguageData && (
+                  <img
+                    src={selectedLanguageData.icon}
+                    alt={`${selectedLanguageData.language} logo`}
+                    className="w-6 h-6"
+                  />
+                )}
+                <Tooltip title="Select Language">
+                  <Select
+                    value={language}
+                    onChange={(e) => handleLanguageChange(e.target.value)}
+                    sx={{
+                      bgcolor: currentTheme.selectBackground,
+                      color: currentTheme.text,
+                    }}
+                  >
+                    {LANGUAGE_DATA.map((lang) => (
+                      <MenuItem key={lang.language} value={lang.language}>
+                        {lang.language} ({lang.version})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Tooltip>
+              </>
+            )}
+            {/* Theme Selection with null check */}
+            {THEMES && Object.keys(THEMES).length > 0 && (
+              <Tooltip title="Select Theme">
                 <Select
-                  value={language}
-                  onChange={(e) => handleLanguageChange(e.target.value)}
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
                   sx={{
                     bgcolor: currentTheme.selectBackground,
                     color: currentTheme.text,
                   }}
                 >
-                  {LANGUAGE_DATA.map((lang) => (
-                    <MenuItem key={lang.language} value={lang.language}>
-                      {lang.language} ({lang.version})
+                  {Object.keys(THEMES).map((themeName) => (
+                    <MenuItem key={themeName} value={themeName}>
+                      {themeName}
                     </MenuItem>
                   ))}
                 </Select>
               </Tooltip>
-            </>
-          )}
-          <Tooltip title="Select Theme">
-            <Select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              sx={{
-                bgcolor: currentTheme.selectBackground,
-                color: currentTheme.text,
-              }}
-            >
-              {Object.keys(THEMES).map((themeName) => (
-                <MenuItem key={themeName} value={themeName}>
-                  {themeName}
-                </MenuItem>
-              ))}
-            </Select>
-          </Tooltip>
-        </Box>
+            )}
+          </Box>
 
-        {/* Center Section */}
-        <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", gap: 2 }}>
-          <Tooltip title="Run Code">
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: "#4CAF50",
-                "&:hover": { bgcolor: "#45a049" },
-              }}
-              onClick={handleRunCode}
-            >
-              Run Code
-            </Button>
-          </Tooltip>
-          <Tooltip title="Toggle Terminal">
-            <IconButton
-              onClick={handleTerminalToggle}
-              sx={{ color: "#FFD700" }} // Gold color for terminal icon
-            >
-              <TerminalIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        {/* Right Section */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Tooltip title="Decrease Font Size">
-            <IconButton color="inherit">
-              <TextDecreaseIcon />
-            </IconButton>
-          </Tooltip>
-          <Slider
-            value={fontSize}
-            min={10}
-            max={30}
-            step={1}
-            onChange={handleFontSizeChange}
-            sx={{ width: 100, color: currentTheme.slider }}
-          />
-          <Tooltip title="Increase Font Size">
-            <IconButton color="inherit">
-              <TextIncreaseIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Toggle Word Wrap">
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Switch
-                checked={isWrappingEnabled}
-                onChange={handleWrappingToggle}
+          {/* Center Section */}
+          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", gap: 2 }}>
+            <Tooltip title="Run Code">
+              <Button
+                variant="contained"
                 sx={{
-                  "& .MuiSwitch-thumb": {
-                    color: currentTheme.switchThumb,
-                  },
-                  "& .MuiSwitch-track": {
-                    backgroundColor: currentTheme.switchTrack,
-                  },
+                  bgcolor: "#4CAF50", // Always the same green color
+                  "&:hover": { bgcolor: "#45a049" },
+                  minWidth: 120,
+                  height: 40,
+                  position: "relative",
+                  transition: "background-color 0.3s ease",
+                  // Disabled state styling
+                  "&:disabled": {
+                    bgcolor: "#4CAF50", // Keep same green when disabled
+                    opacity: 0.8, // Slightly transparent when loading
+                  }
                 }}
-              />
-              <Typography sx={{ color: currentTheme.text }}>Wrap</Typography>
-            </Box>
-          </Tooltip>
-          <Tooltip title="Download Code">
-            <IconButton
-              onClick={handleDownloadClick}
-              sx={{ color: "#2196F3" }} // Blue color for download icon
-            >
-              <DownloadIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </Toolbar>
-    </AppBar>
+                onClick={handleRunCode}
+                disabled={isExecuting}
+              >
+                {isExecuting ? (
+                  <CircularProgress
+                    size={24}
+                    thickness={4}
+                    sx={{
+                      color: "white",
+                    }}
+                  />
+                ) : (
+                  "Run Code"
+                )}
+              </Button>
+            </Tooltip>
+            <Tooltip title="Toggle Terminal">
+              <IconButton
+                onClick={handleTerminalToggle}
+                sx={{ color: "#FFD700" }}
+              >
+                <TerminalIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          {/* Right Section */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Tooltip title="Settings">
+              <IconButton onClick={handleSettingsOpen} color="inherit">
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Download Code">
+              <IconButton
+                onClick={handleDownloadClick}
+                sx={{ color: "#2196F3" }}
+              >
+                <DownloadIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      <SettingsPopup
+        open={settingsOpen}
+        onClose={handleSettingsClose}
+        isWrappingEnabled={isWrappingEnabled}
+        setIsWrappingEnabled={setIsWrappingEnabled}
+        fontSize={fontSize}
+        updateFontSize={updateFontSize}
+        currentTheme={currentTheme}
+      />
+    </>
   );
 };
 

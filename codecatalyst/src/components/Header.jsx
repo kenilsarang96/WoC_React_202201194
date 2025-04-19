@@ -47,7 +47,7 @@ const Header = ({ className = "" }) => {
         dispatch(logout());
         navigate("/");
       })
-      .catch((error) => console.error(error));
+      .catch((error) => console.error());
   }, [dispatch, navigate]);
 
   const vsCodeDarkTheme = {

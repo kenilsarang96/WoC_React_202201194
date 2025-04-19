@@ -48,7 +48,7 @@ export const useLanguageData = () => {
   };
 
   const handleCodeChange = (newCode) => {
-    setCode(newCode); 
+      setCode(newCode); 
     if (authStatus && selectedFile) {
       localStorage.setItem("code", newCode); 
 
@@ -57,7 +57,7 @@ export const useLanguageData = () => {
       }
       saveTimeoutRef.current = setTimeout(() => {
         try {
-          dispatch(modifyFileCode(userId, selectedFile.id, newCode));
+        dispatch(modifyFileCode(userId, selectedFile.id, newCode));
         } catch (error) {
           console.error("Failed to save code to Firestore:", error);
         }

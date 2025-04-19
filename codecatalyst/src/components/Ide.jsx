@@ -99,7 +99,7 @@ const Ide = () => {
     localStorage.setItem("editorFontSize", newSize.toString());
   }, []);
 
-  const handleRunCode = useCallback(() => {
+  const handleRunCode = useCallback(async() => {
     if (!isTerminalVisible) {
       setIsTerminalVisible(true);
     }

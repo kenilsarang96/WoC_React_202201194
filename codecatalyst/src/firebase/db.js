@@ -3,15 +3,12 @@ import { app } from "../conf/conf.js";
 import { collection, addDoc, doc, updateDoc, deleteDoc, getDocs, query, where } from "firebase/firestore";
 import { toast } from "react-toastify"; 
 
-export class DatabaseService {
-    
-    db;
 
+export class DatabaseService {
+    db;
     constructor(){
         this.db = getFirestore(app);
     }
-
-
     async addFile(userId, file) {
         try {
             if (!userId) {
@@ -82,7 +79,6 @@ export class DatabaseService {
             throw error;
         }
     }
-
     async deleteFile(userId, fileId) {
         try {
             if (!userId) {
@@ -103,7 +99,6 @@ export class DatabaseService {
             throw error;
         }
     }
-
     async getFiles(userId) {
         try {
             if (!userId) {
@@ -151,6 +146,7 @@ export class DatabaseService {
             throw error;
         }
     }
+
 }
 
 const databaseService = new DatabaseService();

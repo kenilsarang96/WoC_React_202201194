@@ -8,6 +8,7 @@ import { RouterProvider,createBrowserRouter } from 'react-router-dom'
 import {StartPage,LoginPage,SignupPage,Editor,NotFoundPage} from "./pages"
 import {AuthLayout} from "./components"
 
+
 const router = createBrowserRouter([
   {
     path:"/",
