@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, memo } from "react";
-import { useSelector,useDispatch } from "react-redux";
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Dialog,
   DialogTitle,
@@ -11,15 +11,14 @@ import {
   ListItem,
   ListItemText,
   Typography,
-} from "@mui/material";
-import databaseService from "../firebase/db";
-import { selectFile } from "../store/fileSlice";
-
+} from '@mui/material';
+import databaseService from '../firebase/db';
+import { selectFile } from '../store/fileSlice';
 
 const SearchFileDialog = ({ open, onClose }) => {
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth.userId);
-  const [searchPrefix, setSearchPrefix] = useState("");
+  const [searchPrefix, setSearchPrefix] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -35,25 +34,26 @@ const SearchFileDialog = ({ open, onClose }) => {
         const results = await databaseService.searchFilesByPrefix(userId, searchPrefix.trim());
         setSearchResults(results);
       } catch (error) {
-        console.error("Error searching files:", error);
+        console.error('Error searching files:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    
-
     const debounceTimer = setTimeout(() => {
       searchFiles();
-    }, 1000); 
+    }, 1000);
 
-    return () => clearTimeout(debounceTimer); 
+    return () => clearTimeout(debounceTimer);
   }, [searchPrefix, userId]);
 
-  const handleFileClick = useCallback((fileId) => {
-    dispatch(selectFile(fileId)); 
-    onClose();
-  }, [dispatch, onClose]);
+  const handleFileClick = useCallback(
+    (fileId) => {
+      dispatch(selectFile(fileId));
+      onClose();
+    },
+    [dispatch, onClose],
+  );
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -69,13 +69,9 @@ const SearchFileDialog = ({ open, onClose }) => {
         {loading ? (
           <Typography variant="body2">Searching...</Typography>
         ) : searchResults.length > 0 ? (
-            <List>
+          <List>
             {searchResults.map((file) => (
-              <ListItem
-                key={file.id}
-                button 
-                onClick={() => handleFileClick(file.id)} 
-              >
+              <ListItem key={file.id} button onClick={() => handleFileClick(file.id)}>
                 <ListItemText primary={file.name} secondary={file.language} />
               </ListItem>
             ))}
@@ -91,6 +87,6 @@ const SearchFileDialog = ({ open, onClose }) => {
       </DialogActions>
     </Dialog>
   );
-}
+};
 
 export default memo(SearchFileDialog);

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  isExecuting: false
+  isExecuting: false,
 };
 
 const codeExecutionSlice = createSlice({
@@ -13,8 +13,8 @@ const codeExecutionSlice = createSlice({
     },
     endExecution: (state) => {
       state.isExecuting = false;
-    }
-  }
+    },
+  },
 });
 
 export const { startExecution, endExecution } = codeExecutionSlice.actions;

@@ -1,12 +1,12 @@
-import React from 'react'
-import Ide from '../components/Ide'
+import React from 'react';
+import Ide from '../components/Ide';
 
 function Editor() {
   return (
     <div>
-        <Ide/>
+      <Ide />
     </div>
-  )
+  );
 }
 
-export default Editor
+export default Editor;

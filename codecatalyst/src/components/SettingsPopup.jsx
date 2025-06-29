@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Dialog,
@@ -9,13 +9,13 @@ import {
   Slider,
   Typography,
   Switch,
-  styled
-} from "@mui/material";
+  styled,
+} from '@mui/material';
 import {
   TextIncrease as TextIncreaseIcon,
   TextDecrease as TextDecreaseIcon,
-} from "@mui/icons-material";
-import { useTheme } from "../hooks/useTheme";
+} from '@mui/icons-material';
+import { useTheme } from '../hooks/useTheme';
 
 // Custom styled switch component
 const IOSSwitch = styled((props) => (
@@ -74,24 +74,24 @@ const SettingsPopup = ({
 
   const themeColors = {
     dark: {
-      background: "#1E1E1E",
-      textPrimary: "#FFFFFF",
-      textSecondary: "#AAAAAA",
-      divider: "#3A3A3A",
-      primary: "#4A80F0",
-      hover: "rgba(255, 255, 255, 0.08)",
-      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336",
-      switchThumb: "#FFFFFF",
+      background: '#1E1E1E',
+      textPrimary: '#FFFFFF',
+      textSecondary: '#AAAAAA',
+      divider: '#3A3A3A',
+      primary: '#4A80F0',
+      hover: 'rgba(255, 255, 255, 0.08)',
+      switchTrack: isWrappingEnabled ? '#4CAF50' : '#F44336',
+      switchThumb: '#FFFFFF',
     },
     light: {
-      background: "#FFFFFF",
-      textPrimary: "#333333",
-      textSecondary: "#666666",
-      divider: "#E0E0E0",
-      primary: "#2962FF",
-      hover: "rgba(0, 0, 0, 0.04)",
-      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336",
-      switchThumb: "#FFFFFF",
+      background: '#FFFFFF',
+      textPrimary: '#333333',
+      textSecondary: '#666666',
+      divider: '#E0E0E0',
+      primary: '#2962FF',
+      hover: 'rgba(0, 0, 0, 0.04)',
+      switchTrack: isWrappingEnabled ? '#4CAF50' : '#F44336',
+      switchThumb: '#FFFFFF',
     },
   };
 
@@ -105,8 +105,6 @@ const SettingsPopup = ({
     setIsWrappingEnabled((prev) => !prev);
   };
 
-
-
   return (
     <Dialog
       open={open}
@@ -117,8 +115,8 @@ const SettingsPopup = ({
         sx: {
           backgroundColor: currenttheme.background,
           border: `1px solid ${currenttheme.divider}`,
-          borderRadius: "12px",
-          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.16)",
+          borderRadius: '12px',
+          boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.16)',
           overflow: 'hidden',
         },
       }}
@@ -127,23 +125,25 @@ const SettingsPopup = ({
         sx={{
           color: currenttheme.textPrimary,
           borderBottom: `1px solid ${currenttheme.divider}`,
-          padding: "16px 24px",
+          padding: '16px 24px',
           fontWeight: 600,
-          fontSize: "1.125rem",
+          fontSize: '1.125rem',
           backgroundColor: currenttheme.background,
         }}
       >
         Editor Settings
       </DialogTitle>
 
-      <DialogContent sx={{ 
-        padding: "20px 24px",
-        backgroundColor: currenttheme.background,
-      }}>
+      <DialogContent
+        sx={{
+          padding: '20px 24px',
+          backgroundColor: currenttheme.background,
+        }}
+      >
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
+            display: 'flex',
+            flexDirection: 'column',
             gap: 3,
           }}
         >
@@ -155,23 +155,23 @@ const SettingsPopup = ({
               sx={{
                 fontWeight: 500,
                 color: currenttheme.textPrimary,
-                marginBottom: "8px",
+                marginBottom: '8px',
               }}
             >
               Font Size
             </Typography>
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 2,
-                padding: "0 8px",
+                padding: '0 8px',
               }}
             >
               <TextDecreaseIcon
                 sx={{
                   color: currenttheme.textSecondary,
-                  fontSize: "1.25rem",
+                  fontSize: '1.25rem',
                 }}
               />
               <Slider
@@ -208,7 +208,7 @@ const SettingsPopup = ({
               <TextIncreaseIcon
                 sx={{
                   color: currenttheme.textSecondary,
-                  fontSize: "1.25rem",
+                  fontSize: '1.25rem',
                 }}
               />
             </Box>
@@ -217,11 +217,11 @@ const SettingsPopup = ({
           {/* Word Wrap Toggle */}
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "12px 16px",
-              borderRadius: "8px",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 16px',
+              borderRadius: '8px',
               backgroundColor: currenttheme.hover,
             }}
           >
@@ -234,7 +234,7 @@ const SettingsPopup = ({
             >
               Word Wrap
             </Typography>
-            <IOSSwitch 
+            <IOSSwitch
               checked={isWrappingEnabled}
               onChange={handleWrappingToggle}
               currenttheme={currenttheme}
@@ -246,7 +246,7 @@ const SettingsPopup = ({
       <DialogActions
         sx={{
           borderTop: `1px solid ${currenttheme.divider}`,
-          padding: "16px 24px",
+          padding: '16px 24px',
           backgroundColor: currenttheme.background,
         }}
       >
@@ -256,8 +256,8 @@ const SettingsPopup = ({
           sx={{
             color: currenttheme.textSecondary,
             fontWeight: 500,
-            borderRadius: "8px",
-            padding: "6px 16px",
+            borderRadius: '8px',
+            padding: '6px 16px',
             '&:hover': {
               backgroundColor: currenttheme.hover,
             },

@@ -8,7 +8,7 @@ const UpcomingContestsPopup = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [ongoingContest, setOngoingContest] = useState(null);
-  const { GlobalTheme } = useTheme(); 
+  const { GlobalTheme } = useTheme();
 
   const isToday = (date) => {
     const today = new Date();
@@ -62,30 +62,30 @@ const UpcomingContestsPopup = () => {
   // Theme-based colors
   const themeColors = {
     dark: {
-      background: "#1E1E1E", // VS Code dark background
-      text: "#D4D4D4", // Light gray text
-      border: "#333333", // Dark border
-      buttonBackground: ongoingContest ? "#10B981" : "#4EC9B0", // VS Code cyan/green for buttons
-      buttonHover: ongoingContest ? "#059669" : "#6BD8C2", // VS Code cyan/green hover
-      popupBackground: "#252526", // VS Code dark card background
-      popupText: "#D4D4D4", // Light gray text
-      popupBorder: "#333333", // Dark border
-      ongoingContestBackground: "#10B981", // Green for ongoing contest
-      ongoingContestText: "#FFFFFF", // White text
-      errorText: "#FF5555", // Red for errors
+      background: '#1E1E1E', // VS Code dark background
+      text: '#D4D4D4', // Light gray text
+      border: '#333333', // Dark border
+      buttonBackground: ongoingContest ? '#10B981' : '#4EC9B0', // VS Code cyan/green for buttons
+      buttonHover: ongoingContest ? '#059669' : '#6BD8C2', // VS Code cyan/green hover
+      popupBackground: '#252526', // VS Code dark card background
+      popupText: '#D4D4D4', // Light gray text
+      popupBorder: '#333333', // Dark border
+      ongoingContestBackground: '#10B981', // Green for ongoing contest
+      ongoingContestText: '#FFFFFF', // White text
+      errorText: '#FF5555', // Red for errors
     },
     light: {
-      background: "#FFFFFF", // Light background
-      text: "#1F2937", // Dark text
-      border: "#E5E7EB", // Light border
-      buttonBackground: ongoingContest ? "#34D399" : "#3B82F6", // Light mode cyan/green for buttons
-      buttonHover: ongoingContest ? "#2E8B57" : "#2563EB", // Light mode cyan/green hover
-      popupBackground: "#F9FAFB", // Light card background
-      popupText: "#1F2937", // Dark text
-      popupBorder: "#E5E7EB", // Light border
-      ongoingContestBackground: "#34D399", // Green for ongoing contest
-      ongoingContestText: "#FFFFFF", // White text
-      errorText: "#FF0000", // Red for errors
+      background: '#FFFFFF', // Light background
+      text: '#1F2937', // Dark text
+      border: '#E5E7EB', // Light border
+      buttonBackground: ongoingContest ? '#34D399' : '#3B82F6', // Light mode cyan/green for buttons
+      buttonHover: ongoingContest ? '#2E8B57' : '#2563EB', // Light mode cyan/green hover
+      popupBackground: '#F9FAFB', // Light card background
+      popupText: '#1F2937', // Dark text
+      popupBorder: '#E5E7EB', // Light border
+      ongoingContestBackground: '#34D399', // Green for ongoing contest
+      ongoingContestText: '#FFFFFF', // White text
+      errorText: '#FF0000', // Red for errors
     },
   };
 
@@ -99,7 +99,7 @@ const UpcomingContestsPopup = () => {
         className={`${
           ongoingContest
             ? 'bg-green-600 hover:bg-green-700 animate-pulse'
-            : 'bg-cyan-600 hover:bg-cyan-700' 
+            : 'bg-cyan-600 hover:bg-cyan-700'
         } text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-cyan-500/50 transition-all`}
         style={{
           backgroundColor: currentTheme.buttonBackground,
@@ -118,10 +118,7 @@ const UpcomingContestsPopup = () => {
             border: `1px solid ${currentTheme.popupBorder}`,
           }}
         >
-          <h3
-            className="text-lg font-bold mb-4"
-            style={{ color: currentTheme.cyanText }}
-          >
+          <h3 className="text-lg font-bold mb-4" style={{ color: currentTheme.cyanText }}>
             {ongoingContest ? 'Ongoing Contest' : 'Upcoming Contests'}
           </h3>
 

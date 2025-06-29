@@ -1,6 +1,6 @@
-import React, { useEffect, useState, memo } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, memo } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const AuthLayout = ({ children, authRequired = true }) => {
   const navigate = useNavigate();
@@ -9,16 +9,12 @@ const AuthLayout = ({ children, authRequired = true }) => {
 
   useEffect(() => {
     if (!authStatus && authRequired) {
-      navigate("/");
+      navigate('/');
     }
     setLoader(false);
   }, [authStatus, navigate, authRequired]);
 
-  return loader ? (
-    <p className="text-lg font-semibold">Loading...</p>
-  ) : (
-    <>{children}</>
-  );
+  return loader ? <p className="text-lg font-semibold">Loading...</p> : <>{children}</>;
 };
 
 export default memo(AuthLayout);

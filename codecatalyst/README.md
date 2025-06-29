@@ -24,24 +24,24 @@ CodeCatalyst is a powerful and sleek web-based code editor that offers a rich se
 
 1. Clone the repository:
 
-    ```sh
-    git clone https://github.com/yourusername/codecatalyst.git
-    cd codecatalyst
-    ```
+   ```sh
+   git clone https://github.com/yourusername/codecatalyst.git
+   cd codecatalyst
+   ```
 
 2. Install dependencies:
 
-    ```sh
-    npm install
-    ```
+   ```sh
+   npm install
+   ```
 
 ### Running the Application
 
 1. Start the development server:
 
-    ```sh
-    npm run dev
-    ```
+   ```sh
+   npm run dev
+   ```
 
 2. Open your browser and navigate to `http://localhost:3000`.
 
@@ -49,15 +49,15 @@ CodeCatalyst is a powerful and sleek web-based code editor that offers a rich se
 
 1. Build the application:
 
-    ```sh
-    npm run build
-    ```
+   ```sh
+   npm run build
+   ```
 
 2. Serve the production build:
 
-    ```sh
-    npm run serve
-    ```
+   ```sh
+   npm run serve
+   ```
 
 ## Technologies Used
 

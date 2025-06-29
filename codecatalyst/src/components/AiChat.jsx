@@ -1,14 +1,14 @@
-import React, { useState, useCallback, memo } from "react";
-import "react-resizable/css/styles.css";
-import { Rnd } from "react-rnd";
-import { model } from "../conf/conf";
-import { IconButton, CircularProgress } from "@mui/material";
-import { Send, Close, Chat } from "@mui/icons-material";
+import React, { useState, useCallback, memo } from 'react';
+import 'react-resizable/css/styles.css';
+import { Rnd } from 'react-rnd';
+import { model } from '../conf/conf';
+import { IconButton, CircularProgress } from '@mui/material';
+import { Send, Close, Chat } from '@mui/icons-material';
 
 const AiChat = memo(() => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [size, setSize] = useState({ width: 320, height: 384 });
   const [state, setState] = useState({
     width: 400,
@@ -18,43 +18,40 @@ const AiChat = memo(() => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = useCallback(async (e) => {
-    e.preventDefault();
-    if (input.trim()) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: input, sender: "user" },
-      ]);
-      setInput("");
-      setIsLoading(true);
+  const handleSendMessage = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (input.trim()) {
+        setMessages((prevMessages) => [...prevMessages, { text: input, sender: 'user' }]);
+        setInput('');
+        setIsLoading(true);
 
-      try {
-        const result = await model.generateContent(input);
-        const response = await result.response;
-        const text = response.text();
+        try {
+          const result = await model.generateContent(input);
+          const response = await result.response;
+          const text = response.text();
 
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: text, sender: "ai" },
-        ]);
-      } catch (error) {
-        console.error("Error calling Gemini API:", error);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: "Sorry, something went wrong. Please try again.", sender: "ai" },
-        ]);
-      } finally {
-        setIsLoading(false);
+          setMessages((prevMessages) => [...prevMessages, { text: text, sender: 'ai' }]);
+        } catch (error) {
+          console.error('Error calling Gemini API:', error);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: 'Sorry, something went wrong. Please try again.', sender: 'ai' },
+          ]);
+        } finally {
+          setIsLoading(false);
+        }
       }
-    }
-  }, [input]);
+    },
+    [input],
+  );
 
   const onResize = useCallback((event, { size }) => {
     setSize(size);
   }, []);
 
   const formatTextWithNewLines = (text) => {
-    return { __html: text.replace(/\n/g, "<br />") };
+    return { __html: text.replace(/\n/g, '<br />') };
   };
 
   return (
@@ -63,9 +60,9 @@ const AiChat = memo(() => {
         <IconButton
           onClick={() => setIsExpanded((prev) => !prev)}
           sx={{
-            backgroundColor: "primary.main",
-            color: "white",
-            "&:hover": { backgroundColor: "primary.dark" },
+            backgroundColor: 'primary.main',
+            color: 'white',
+            '&:hover': { backgroundColor: 'primary.dark' },
           }}
         >
           <Chat />
@@ -102,22 +99,17 @@ const AiChat = memo(() => {
             topLeft: true,
             topRight: true,
           }}
-          dragHandleClassName="drag-handle" 
-          enableUserSelectHack={true} 
+          dragHandleClassName="drag-handle"
+          enableUserSelectHack={true}
         >
           <div
             style={{ width: state.width, height: state.height }}
             className="bg-gray-900 rounded-lg shadow-lg flex flex-col border border-cyan-500/20"
           >
             {/* Chat Header */}
-            <div
-              className="drag-handle flex items-center justify-between p-4 bg-gradient-to-r from-cyan-800 to-blue-900 text-white rounded-t-lg cursor-move"
-            >
+            <div className="drag-handle flex items-center justify-between p-4 bg-gradient-to-r from-cyan-800 to-blue-900 text-white rounded-t-lg cursor-move">
               <h2 className="text-lg font-semibold">AI Assistant</h2>
-              <IconButton
-                onClick={() => setIsExpanded((prev) => !prev)}
-                sx={{ color: "white" }}
-              >
+              <IconButton onClick={() => setIsExpanded((prev) => !prev)} sx={{ color: 'white' }}>
                 <Close />
               </IconButton>
             </div>
@@ -127,20 +119,16 @@ const AiChat = memo(() => {
               {messages.map((message, index) => (
                 <div
                   key={index}
-                  className={`mb-4 ${
-                    message.sender === "user" ? "text-right" : "text-left"
-                  }`}
+                  className={`mb-4 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}
                 >
                   <div
                     className={`inline-block p-3 rounded-lg max-w-[80%] ${
-                      message.sender === "user"
-                        ? "bg-gradient-to-r from-cyan-600 to-blue-700 text-white"
-                        : "bg-gray-700 text-gray-200"
+                      message.sender === 'user'
+                        ? 'bg-gradient-to-r from-cyan-600 to-blue-700 text-white'
+                        : 'bg-gray-700 text-gray-200'
                     }`}
                   >
-                    <div
-                      dangerouslySetInnerHTML={formatTextWithNewLines(message.text)}
-                    />
+                    <div dangerouslySetInnerHTML={formatTextWithNewLines(message.text)} />
                   </div>
                 </div>
               ))}
@@ -148,7 +136,7 @@ const AiChat = memo(() => {
                 <div className="text-left mb-4">
                   <div className="inline-block p-3 rounded-lg max-w-[80%] bg-gray-700 text-gray-200">
                     <div className="flex items-center">
-                      <CircularProgress size={16} thickness={5} sx={{ color: "white" }} />
+                      <CircularProgress size={16} thickness={5} sx={{ color: 'white' }} />
                       <span className="ml-2">Thinking...</span>
                     </div>
                   </div>
@@ -169,10 +157,10 @@ const AiChat = memo(() => {
                 <IconButton
                   type="submit"
                   sx={{
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    marginLeft: "8px",
-                    "&:hover": { backgroundColor: "primary.dark" },
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    marginLeft: '8px',
+                    '&:hover': { backgroundColor: 'primary.dark' },
                   }}
                 >
                   <Send />

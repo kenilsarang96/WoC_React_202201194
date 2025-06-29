@@ -1,34 +1,34 @@
-import React, { useEffect, useState, useRef, useCallback, memo } from "react";
-import { Resizable } from "react-resizable";
-import "react-resizable/css/styles.css";
-import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
-import { lineNumbers } from "@codemirror/view";
-import { EditorView } from "@codemirror/view";
-import { autocompletion } from "@codemirror/autocomplete";
-import { useSelector, useDispatch } from "react-redux";
-import { useLanguageData } from "../hooks/useLanguageData";
-import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
-import { THEMES, getTheme } from "../utils/themesUtils";
-import { handleDownload } from "../utils/downloadUtils";
-import { modifyFileCode, fetchFiles } from "../store/fileSlice";
-import { Card, CardContent, Typography, Box, Button } from "@mui/material";
-import Terminal from "./Terminal";
-import AiChat from "./AiChat";
-import Filebar from "./Filebar";
-import Toolbar from "./ToolbarComponent";
-import Header from "./Header";
-import {useTheme} from "../hooks/useTheme";
+import React, { useEffect, useState, useRef, useCallback, memo } from 'react';
+import { Resizable } from 'react-resizable';
+import 'react-resizable/css/styles.css';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
+import { lineNumbers } from '@codemirror/view';
+import { EditorView } from '@codemirror/view';
+import { autocompletion } from '@codemirror/autocomplete';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLanguageData } from '../hooks/useLanguageData';
+import { LANGUAGE_DATA } from '../utils/LANGUAGE_DATA';
+import { THEMES, getTheme } from '../utils/themesUtils';
+import { handleDownload } from '../utils/downloadUtils';
+import { modifyFileCode, fetchFiles } from '../store/fileSlice';
+import { Card, CardContent, Typography, Box, Button } from '@mui/material';
+import Terminal from './Terminal';
+import AiChat from './AiChat';
+import Filebar from './Filebar';
+import Toolbar from './ToolbarComponent';
+import Header from './Header';
+import { useTheme } from '../hooks/useTheme';
 
 const Ide = () => {
-  const [theme, setTheme] = useState("oneDark");
+  const [theme, setTheme] = useState('vscodeDark');
   const [isWrappingEnabled, setIsWrappingEnabled] = useState(false);
   const [isTerminalVisible, setIsTerminalVisible] = useState(false);
   const [isFileBarVisible, setIsFileBarVisible] = useState(true);
   const [fileBarWidth, setFileBarWidth] = useState(330);
   const [fontSize, setFontSize] = useState(() => {
-    const savedFontSize = localStorage.getItem("editorFontSize");
+    const savedFontSize = localStorage.getItem('editorFontSize');
     return savedFontSize ? parseInt(savedFontSize, 10) : 14;
   });
   const [shouldExecuteCode, setShouldExecuteCode] = useState(false);
@@ -44,8 +44,7 @@ const Ide = () => {
   const files = useSelector((state) => state.file.files);
   const selectedFile = files.find((file) => file.id === selectedFileId);
   const userId = useSelector((state) => state.auth.userId);
-  const { GlobalTheme } = useTheme(); 
-  
+  const { GlobalTheme } = useTheme();
 
   useEffect(() => {
     if (headerRef.current) {
@@ -59,13 +58,7 @@ const Ide = () => {
     }
   }, []);
 
-  const {
-    language,
-    code,
-    setCode,
-    selectedLanguageData,
-    handleLanguageChange,
-  } = useLanguageData();
+  const { language, code, setCode, selectedLanguageData, handleLanguageChange } = useLanguageData();
 
   const onResize = useCallback((event, { size }) => {
     setFileBarWidth(size.width);
@@ -73,18 +66,21 @@ const Ide = () => {
 
   const getLanguageExtension = () => {
     switch (language) {
-      case "javascript":
+      case 'javascript':
         return javascript();
-      case "python":
+      case 'python':
         return python();
       default:
         return javascript();
     }
   };
 
-  const handleEditorChange = useCallback((value) => {
-    setCode(value);
-  }, [setCode]);
+  const handleEditorChange = useCallback(
+    (value) => {
+      setCode(value);
+    },
+    [setCode],
+  );
 
   const handleDownloadClick = useCallback(() => {
     if (authStatus && selectedFile) {
@@ -96,10 +92,10 @@ const Ide = () => {
 
   const updateFontSize = useCallback((newSize) => {
     setFontSize(newSize);
-    localStorage.setItem("editorFontSize", newSize.toString());
+    localStorage.setItem('editorFontSize', newSize.toString());
   }, []);
 
-  const handleRunCode = useCallback(async() => {
+  const handleRunCode = useCallback(async () => {
     if (!isTerminalVisible) {
       setIsTerminalVisible(true);
     }
@@ -154,11 +150,11 @@ const Ide = () => {
               minConstraints={[200, Infinity]}
               maxConstraints={[400, Infinity]}
               axis="x"
-              resizeHandles={["e"]}
+              resizeHandles={['e']}
             >
               <div
                 style={{ width: fileBarWidth }}
-                className="bg-gray-800 text-white p-4 overflow-y-auto overflow-x-hidden"
+                className="bg-gray-900 text-white p-3 overflow-y-auto overflow-x-hidden"
               >
                 <Filebar onClose={() => setIsFileBarVisible(false)} />
               </div>
@@ -167,33 +163,29 @@ const Ide = () => {
 
           <div
             style={{
-              width: `calc(100% - ${
-                authStatus && isFileBarVisible ? fileBarWidth : 0
-              }px)`,
-              height: "100%",
+              width: `calc(100% - ${authStatus && isFileBarVisible ? fileBarWidth : 0}px)`,
+              height: '100%',
             }}
             className="h-full flex flex-col"
           >
             <div
               className={`flex-1 overflow-auto ${
-                GlobalTheme === "dark" ? "bg-gray-900" : "bg-gray-100"
+                GlobalTheme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
               }`}
             >
               {authStatus && selectedFile == null && (
                 <div
                   className={`flex items-center justify-center w-full h-full ${
-                    GlobalTheme === "dark" ? "bg-gray-900" : "bg-gray-100"
+                    GlobalTheme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
                   }`}
                 >
                   <Card
                     sx={{
                       maxWidth: 400,
-                      width: "100%",
+                      width: '100%',
                       padding: 2,
                       backgroundColor:
-                        GlobalTheme === "dark"
-                          ? "rgba(255, 255, 255, 0.1)"
-                          : "rgba(0, 0, 0, 0.1)",
+                        GlobalTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                       borderRadius: 2,
                       boxShadow: 3,
                     }}
@@ -204,8 +196,8 @@ const Ide = () => {
                         align="center"
                         sx={{
                           marginBottom: 2,
-                          fontWeight: "bold",
-                          color: GlobalTheme === "dark" ? "#fff" : "#000",
+                          fontWeight: 'bold',
+                          color: GlobalTheme === 'dark' ? '#fff' : '#000',
                         }}
                       >
                         Create a New File to Start Working
@@ -215,22 +207,21 @@ const Ide = () => {
                         align="center"
                         sx={{
                           color:
-                            GlobalTheme === "dark"
-                              ? "rgba(255, 255, 255, 0.7)"
-                              : "rgba(0, 0, 0, 0.7)",
+                            GlobalTheme === 'dark'
+                              ? 'rgba(255, 255, 255, 0.7)'
+                              : 'rgba(0, 0, 0, 0.7)',
                           marginBottom: 3,
                         }}
                       >
-                        Start by creating your first file. Once you create a
-                        file, you can start editing and running code.
+                        Start by creating your first file. Once you create a file, you can start
+                        editing and running code.
                       </Typography>
                     </CardContent>
                   </Card>
                 </div>
               )}
 
-              {(!authStatus ||
-                (authStatus && files.length > 0 && selectedFileId)) && (
+              {(!authStatus || (authStatus && files.length > 0 && selectedFileId)) && (
                 <CodeMirror
                   value={code}
                   extensions={[
@@ -239,14 +230,14 @@ const Ide = () => {
                     autocompletion(),
                     isWrappingEnabled ? EditorView.lineWrapping : [],
                   ]}
-                  theme={getTheme(theme)} 
+                  theme={getTheme(theme)}
                   height="100%"
                   width="100%"
                   onChange={handleEditorChange}
                   basicSetup={{
                     lineWrapping: isWrappingEnabled,
                   }}
-                  style={{ fontSize: `${fontSize}px`, height: "100%" }}
+                  style={{ fontSize: `${fontSize}px`, height: '100%' }}
                 />
               )}
             </div>

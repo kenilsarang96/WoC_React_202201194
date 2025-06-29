@@ -1,8 +1,8 @@
-import React, { useState, useCallback, memo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../store/authSlice";
-import authService from "../firebase/auth";
+import React, { useState, useCallback, memo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../store/authSlice';
+import authService from '../firebase/auth';
 import {
   AppBar,
   Toolbar,
@@ -14,13 +14,12 @@ import {
   Menu,
   MenuItem,
   Avatar,
-} from "@mui/material";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
-import Logo from "./Logo";
-import { useTheme } from "../hooks/useTheme";
-import { red } from "@mui/material/colors";
+} from '@mui/material';
+import { Brightness4, Brightness7 } from '@mui/icons-material';
+import Logo from './Logo';
+import { useTheme } from '../hooks/useTheme';
 
-const Header = ({ className = "" }) => {
+const Header = ({ className = '' }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -45,60 +44,27 @@ const Header = ({ className = "" }) => {
       .logoutHandler()
       .then(() => {
         dispatch(logout());
-        navigate("/");
+        navigate('/');
       })
       .catch((error) => console.error());
   }, [dispatch, navigate]);
-
-  const vsCodeDarkTheme = {
-    background: "#1E1E1E", // Dark background
-    text: "#FFFFFF", // White text
-    border: "#333333", // Dark border
-    buttonBackground: "#333333", // Dark button background
-    buttonHover: "#3C3C3C", // Darker button hover
-    modalBackground: "#252526", // Dark modal background
-    modalBorder: "#333333", // Dark modal border
-    errorButton: "#F44336", // Red error button
-  };
-
-  const currentTheme =
-    GlobalTheme === "dark"
-      ? vsCodeDarkTheme
-      : {
-          background: "#FFFFFF", // Light background
-          text: "#000000", // Black text
-          border: "#E5E7EB", // Light border
-          buttonBackground: "#E5E7EB", // Light button background
-          buttonHover: "#D1D5DB", // Lighter button hover
-          modalBackground: "#FFFFFF", // Light modal background
-          modalBorder: "#E5E7EB", // Light modal border
-          errorButton: "#F44336", // Red error button
-        };
 
   return (
     <>
       <AppBar
         position="static"
-        className={`shadow-md backdrop-blur-lg ${className}`}
+        className={`shadow-md ${className}`}
         sx={{
-          background:
-            GlobalTheme === "dark"
-              ? "linear-gradient(135deg, rgba(30,30,30,0.85), rgba(50,50,50,0.85))"
-              : "linear-gradient(135deg, rgba(240,240,240,0.9), rgba(255,255,255,0.9))",
-          color: currentTheme.text,
-          borderBottom: `1px solid ${currentTheme.border}`,
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)", // For Safari
+          backgroundColor: GlobalTheme === 'dark' ? '#121212' : '#ffffff',
+          color: GlobalTheme === 'dark' ? '#ffffff' : '#000000',
+          borderBottom: GlobalTheme === 'dark' ? '1px solid #333' : '1px solid #e0e0e0',
         }}
       >
         <Toolbar className="flex justify-between">
           {/* Logo & Title */}
           <div className="flex items-center">
             <Logo className="h-10 w-10 mr-2" />
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", color: currentTheme.text }}
-            >
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               CodeCatalyst
             </Typography>
           </div>
@@ -112,9 +78,9 @@ const Header = ({ className = "" }) => {
                   <Avatar
                     src={
                       userImgUrl == null
-                        ? "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+                        ? 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'
                         : userImgUrl
-                    } // Use userImgUrl from authSlice
+                    }
                     alt=""
                     sx={{ width: 40, height: 40 }}
                   />
@@ -125,11 +91,10 @@ const Header = ({ className = "" }) => {
                   anchorEl={anchorEl}
                   open={open}
                   onClose={handleClose}
-                  sx={{
-                    "& .MuiPaper-root": {
-                      // Target the Paper component inside Menu
-                      backgroundColor: "transparent", // Remove white background
-                      boxShadow: "none", // Remove default shadow
+                  PaperProps={{
+                    sx: {
+                      backgroundColor: GlobalTheme === 'dark' ? '#333' : '#f5f5f5',
+                      border: GlobalTheme === 'dark' ? '1px solid #444' : '1px solid #ddd',
                     },
                   }}
                 >
@@ -139,14 +104,10 @@ const Header = ({ className = "" }) => {
                       setShowLogoutModal(true);
                     }}
                     sx={{
-                      backgroundColor: "red", // Red background
-                      color: "white", // White text
-                      borderRadius: "4px", // Rounded corners
-                      padding: "8px 16px", // Padding for button-like appearance
-                      margin: "4px", // Margin for spacing
-                      textAlign: "center", // Center text
-                      "&:hover": {
-                        backgroundColor: "darkred", // Darker red on hover
+                      backgroundColor: '#f44336',
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: '#d32f2f',
                       },
                     }}
                   >
@@ -156,33 +117,27 @@ const Header = ({ className = "" }) => {
               </>
             ) : (
               <>
-                {location.pathname !== "/ide" && (
+                {location.pathname !== '/ide' && (
                   <>
-                    {location.pathname === "/guest" && (
+                    {location.pathname === '/guest' && (
                       <Button
-                        variant="contained"
-                        onClick={() => navigate("/signup")}
+                        variant="outlined"
+                        onClick={() => navigate('/signup')}
                         sx={{
-                          backgroundColor: "rgba(255, 255, 255, 0.2)",
-                          color: currentTheme.text,
-                          "&:hover": {
-                            backgroundColor: "rgba(255, 255, 255, 0.3)",
-                          },
+                          borderColor: GlobalTheme === 'dark' ? '#555' : '#ccc',
+                          color: GlobalTheme === 'dark' ? '#fff' : '#000',
                         }}
                       >
                         Sign up
                       </Button>
                     )}
-                    {location.pathname === "/" && (
+                    {location.pathname === '/' && (
                       <Button
-                        variant="contained"
-                        onClick={() => navigate("/guest")}
+                        variant="outlined"
+                        onClick={() => navigate('/guest')}
                         sx={{
-                          backgroundColor: "rgba(255, 255, 255, 0.2)",
-                          color: currentTheme.text,
-                          "&:hover": {
-                            backgroundColor: "rgba(255, 255, 255, 0.3)",
-                          },
+                          borderColor: GlobalTheme === 'dark' ? '#555' : '#ccc',
+                          color: GlobalTheme === 'dark' ? '#fff' : '#000',
                         }}
                       >
                         Try for free
@@ -190,12 +145,12 @@ const Header = ({ className = "" }) => {
                     )}
                     <Button
                       variant="contained"
-                      onClick={() => navigate("/login")}
+                      onClick={() => navigate('/login')}
                       sx={{
-                        backgroundColor: "rgba(255, 255, 255, 0.2)",
-                        color: currentTheme.text,
-                        "&:hover": {
-                          backgroundColor: "rgba(255, 255, 255, 0.3)",
+                        backgroundColor: GlobalTheme === 'dark' ? '#333' : '#e0e0e0',
+                        color: GlobalTheme === 'dark' ? '#fff' : '#000',
+                        '&:hover': {
+                          backgroundColor: GlobalTheme === 'dark' ? '#444' : '#d5d5d5',
                         },
                       }}
                     >
@@ -206,9 +161,17 @@ const Header = ({ className = "" }) => {
               </>
             )}
 
-            {/* Theme Toggle */}
-            <IconButton onClick={toggleTheme} sx={{ color: currentTheme.text }}>
-              {GlobalTheme === "dark" ? <Brightness7 /> : <Brightness4 />}
+            {/* Theme Toggle - Updated to ensure visibility */}
+            <IconButton
+              onClick={toggleTheme}
+              sx={{
+                color: GlobalTheme === 'dark' ? '#fff' : '#000',
+                '&:hover': {
+                  backgroundColor: GlobalTheme === 'dark' ? '#333' : '#e0e0e0',
+                },
+              }}
+            >
+              {GlobalTheme === 'dark' ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
           </div>
         </Toolbar>
@@ -223,27 +186,31 @@ const Header = ({ className = "" }) => {
       >
         <Box
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             width: 400,
-            bgcolor: currentTheme.modalBackground,
-            color: currentTheme.text,
+            bgcolor: GlobalTheme === 'dark' ? '#333' : '#fff',
+            color: GlobalTheme === 'dark' ? '#fff' : '#000',
             boxShadow: 24,
             p: 4,
             borderRadius: 2,
-            border: `1px solid ${currentTheme.modalBorder}`,
+            border: GlobalTheme === 'dark' ? '1px solid #444' : '1px solid #ddd',
           }}
         >
           <Typography id="logout-modal-title" variant="h6" component="h2">
             Are you sure you want to logout?
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
             <Button
               onClick={() => setShowLogoutModal(false)}
               variant="outlined"
-              sx={{ mr: 2, color: currentTheme.text }}
+              sx={{
+                mr: 2,
+                borderColor: GlobalTheme === 'dark' ? '#555' : '#ccc',
+                color: GlobalTheme === 'dark' ? '#fff' : '#000',
+              }}
             >
               No
             </Button>
@@ -254,8 +221,8 @@ const Header = ({ className = "" }) => {
               }}
               variant="contained"
               sx={{
-                backgroundColor: currentTheme.errorButton,
-                "&:hover": { backgroundColor: "#D32F2F" },
+                backgroundColor: '#f44336',
+                '&:hover': { backgroundColor: '#d32f2f' },
               }}
             >
               Yes
@@ -265,6 +232,6 @@ const Header = ({ className = "" }) => {
       </Modal>
     </>
   );
-}
+};
 
 export default memo(Header);

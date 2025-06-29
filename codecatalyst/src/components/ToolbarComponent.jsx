@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState } from "react";
+import React, { memo, useCallback, useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -9,17 +9,17 @@ import {
   Box,
   Tooltip,
   CircularProgress,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Menu as MenuIcon,
   Terminal as TerminalIcon,
   Download as DownloadIcon,
   Settings as SettingsIcon,
-} from "@mui/icons-material";
-import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
-import { useTheme } from "../hooks/useTheme";
-import SettingsPopup from "./SettingsPopup";
-import { useSelector } from "react-redux";
+} from '@mui/icons-material';
+import { LANGUAGE_DATA } from '../utils/LANGUAGE_DATA';
+import { useTheme } from '../hooks/useTheme';
+import SettingsPopup from './SettingsPopup';
+import { useSelector } from 'react-redux';
 
 const ToolbarComponent = ({
   authStatus,
@@ -36,33 +36,19 @@ const ToolbarComponent = ({
   selectedLanguageData,
   language,
   handleLanguageChange,
-  THEMES = {}, // Default empty object if undefined
+  THEMES = {},
 }) => {
   const { GlobalTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // const [isRunning, setIsRunning] = useState(false);
   const isExecuting = useSelector((state) => state.execution.isExecuting);
 
-  const themeColors = {
-    dark: {
-      appBar: "#1E1E1E",
-      text: "#FFFFFF",
-      selectBackground: "rgba(255, 255, 255, 0.1)",
-      slider: "#FFFFFF",
-      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336",
-      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336",
-    },
-    light: {
-      appBar: "#FFFFFF",
-      text: "#000000",
-      selectBackground: "rgba(0, 0, 0, 0.1)",
-      slider: "#000000",
-      switchThumb: isWrappingEnabled ? "#4CAF50" : "#F44336",
-      switchTrack: isWrappingEnabled ? "#4CAF50" : "#F44336",
-    },
+  // Simplified theme colors without borders
+  const currentTheme = {
+    appBar: GlobalTheme === 'dark' ? '#1E1E1E' : '#FFFFFF',
+    text: GlobalTheme === 'dark' ? '#FFFFFF' : '#000000',
+    selectBackground: GlobalTheme === 'dark' ? '#252526' : '#F3F3F3',
+    buttonHover: GlobalTheme === 'dark' ? '#333333' : '#E5E5E5',
   };
-
-  const currentTheme = themeColors[GlobalTheme];
 
   const handleFileBarToggle = useCallback(() => {
     setIsFileBarVisible((prev) => !prev);
@@ -80,23 +66,30 @@ const ToolbarComponent = ({
     setSettingsOpen(false);
   };
 
-
-
   return (
     <>
       <AppBar
         position="static"
-        sx={{ bgcolor: currentTheme.appBar, color: currentTheme.text }}
+        elevation={0}
+        sx={{
+          bgcolor: currentTheme.appBar,
+          color: currentTheme.text,
+        }}
       >
-        <Toolbar>
+        <Toolbar sx={{ padding: '0 16px' }}>
           {/* Left Section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {authStatus && (
               <Tooltip title="Toggle File Bar">
                 <IconButton
                   onClick={handleFileBarToggle}
                   color="inherit"
                   edge="start"
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: currentTheme.buttonHover,
+                    },
+                  }}
                 >
                   <MenuIcon />
                 </IconButton>
@@ -118,10 +111,34 @@ const ToolbarComponent = ({
                     sx={{
                       bgcolor: currentTheme.selectBackground,
                       color: currentTheme.text,
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        border: 'none',
+                      },
+                      '& .MuiSelect-select': {
+                        padding: '8px 32px 8px 12px',
+                      },
+                      minWidth: 150,
+                      borderRadius: '4px',
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          bgcolor: currentTheme.appBar,
+                          color: currentTheme.text,
+                        },
+                      },
                     }}
                   >
                     {LANGUAGE_DATA.map((lang) => (
-                      <MenuItem key={lang.language} value={lang.language}>
+                      <MenuItem
+                        key={lang.language}
+                        value={lang.language}
+                        sx={{
+                          '&:hover': {
+                            bgcolor: currentTheme.buttonHover,
+                          },
+                        }}
+                      >
                         {lang.language} ({lang.version})
                       </MenuItem>
                     ))}
@@ -129,7 +146,6 @@ const ToolbarComponent = ({
                 </Tooltip>
               </>
             )}
-            {/* Theme Selection with null check */}
             {THEMES && Object.keys(THEMES).length > 0 && (
               <Tooltip title="Select Theme">
                 <Select
@@ -138,10 +154,34 @@ const ToolbarComponent = ({
                   sx={{
                     bgcolor: currentTheme.selectBackground,
                     color: currentTheme.text,
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '& .MuiSelect-select': {
+                      padding: '8px 32px 8px 12px',
+                    },
+                    minWidth: 120,
+                    borderRadius: '4px',
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: currentTheme.appBar,
+                        color: currentTheme.text,
+                      },
+                    },
                   }}
                 >
                   {Object.keys(THEMES).map((themeName) => (
-                    <MenuItem key={themeName} value={themeName}>
+                    <MenuItem
+                      key={themeName}
+                      value={themeName}
+                      sx={{
+                        '&:hover': {
+                          bgcolor: currentTheme.buttonHover,
+                        },
+                      }}
+                    >
                       {themeName}
                     </MenuItem>
                   ))}
@@ -151,43 +191,40 @@ const ToolbarComponent = ({
           </Box>
 
           {/* Center Section */}
-          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", gap: 2 }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', gap: 1 }}>
             <Tooltip title="Run Code">
               <Button
                 variant="contained"
                 sx={{
-                  bgcolor: "#4CAF50", // Always the same green color
-                  "&:hover": { bgcolor: "#45a049" },
+                  bgcolor: '#4CAF50',
+                  '&:hover': { bgcolor: '#45a049' },
                   minWidth: 120,
-                  height: 40,
-                  position: "relative",
-                  transition: "background-color 0.3s ease",
-                  // Disabled state styling
-                  "&:disabled": {
-                    bgcolor: "#4CAF50", // Keep same green when disabled
-                    opacity: 0.8, // Slightly transparent when loading
-                  }
+                  height: 36,
+                  position: 'relative',
+                  '&:disabled': {
+                    bgcolor: '#4CAF50',
+                    opacity: 0.8,
+                  },
                 }}
                 onClick={handleRunCode}
                 disabled={isExecuting}
               >
                 {isExecuting ? (
-                  <CircularProgress
-                    size={24}
-                    thickness={4}
-                    sx={{
-                      color: "white",
-                    }}
-                  />
+                  <CircularProgress size={24} thickness={4} sx={{ color: 'white' }} />
                 ) : (
-                  "Run Code"
+                  'Run Code'
                 )}
               </Button>
             </Tooltip>
             <Tooltip title="Toggle Terminal">
               <IconButton
                 onClick={handleTerminalToggle}
-                sx={{ color: "#FFD700" }}
+                sx={{
+                  color: '#FFD700',
+                  '&:hover': {
+                    backgroundColor: currentTheme.buttonHover,
+                  },
+                }}
               >
                 <TerminalIcon />
               </IconButton>
@@ -195,16 +232,29 @@ const ToolbarComponent = ({
           </Box>
 
           {/* Right Section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Tooltip title="Settings">
-              <IconButton onClick={handleSettingsOpen} color="inherit">
+              <IconButton
+                onClick={handleSettingsOpen}
+                sx={{
+                  color: currentTheme.text,
+                  '&:hover': {
+                    backgroundColor: currentTheme.buttonHover,
+                  },
+                }}
+              >
                 <SettingsIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Download Code">
               <IconButton
                 onClick={handleDownloadClick}
-                sx={{ color: "#2196F3" }}
+                sx={{
+                  color: '#2196F3',
+                  '&:hover': {
+                    backgroundColor: currentTheme.buttonHover,
+                  },
+                }}
               >
                 <DownloadIcon />
               </IconButton>

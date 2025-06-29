@@ -1,14 +1,9 @@
-import React, { useState, useEffect, useCallback, memo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  createFile,
-  removeFile,
-  modifyFileName,
-  selectFile,
-} from "../store/fileSlice";
-import { LANGUAGE_DATA } from "../utils/LANGUAGE_DATA";
-import { fetchFiles } from "../store/fileSlice";
-import { ClipLoader } from "react-spinners";
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { createFile, removeFile, modifyFileName, selectFile } from '../store/fileSlice';
+import { LANGUAGE_DATA } from '../utils/LANGUAGE_DATA';
+import { fetchFiles } from '../store/fileSlice';
+import { ClipLoader } from 'react-spinners';
 import {
   Box,
   Button,
@@ -19,12 +14,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  MenuItem 
-} from "@mui/material"; 
-import { Add, Upload, Edit, Delete, Cancel, Check,Search } from "@mui/icons-material"; 
-import { useTheme } from "../hooks/useTheme"; 
-import SearchFileDialog from "./SearchFileDialog";
-
+  MenuItem,
+} from '@mui/material';
+import { Add, Upload, Edit, Delete, Cancel, Check, Search } from '@mui/icons-material';
+import { useTheme } from '../hooks/useTheme';
+import SearchFileDialog from './SearchFileDialog';
 
 const Filebar = () => {
   const dispatch = useDispatch();
@@ -33,49 +27,45 @@ const Filebar = () => {
   const userId = useSelector((state) => state.auth.userId);
   const authStatus = useSelector((state) => state.auth.AuthStatus);
   const loading = useSelector((state) => state.file.loading);
-  const { GlobalTheme } = useTheme(); 
+  
+  const { GlobalTheme } = useTheme();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newFileName, setNewFileName] = useState("");
-  const [newFileLanguage, setNewFileLanguage] = useState("javascript");
+  const [newFileName, setNewFileName] = useState('');
+  const [newFileLanguage, setNewFileLanguage] = useState('javascript');
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [editingFileId, setEditingFileId] = useState(null);
-  const [editFileName, setEditFileName] = useState("");
+  const [editFileName, setEditFileName] = useState('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [fileToDeleteId, setFileToDeleteId] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
   const openSearchDialog = useCallback(() => setIsSearchDialogOpen(true), []);
   const closeSearchDialog = useCallback(() => setIsSearchDialogOpen(false), []);
 
-
   useEffect(() => {
-    
     if (userId) {
       dispatch(fetchFiles(userId));
     }
   }, [dispatch, files.length, authStatus]);
 
   useEffect(() => {
-    localStorage.setItem("selectedFileId", selectedFileId);
+    localStorage.setItem('selectedFileId', selectedFileId);
   }, [selectedFileId]);
 
-    
-    useEffect(() => {
-      const selectedFile = localStorage.getItem("selectedFileId");
-      if (selectedFile) {
-        dispatch(selectFile(selectedFile));
-      }
-    }, [dispatch]);
-  
-
+  useEffect(() => {
+    const selectedFile = localStorage.getItem('selectedFileId');
+    if (selectedFile) {
+      dispatch(selectFile(selectedFile));
+    }
+  }, [dispatch]);
 
   const openDialog = useCallback(() => setIsDialogOpen(true), []);
   const closeDialog = useCallback(() => {
     setIsDialogOpen(false);
-    setNewFileName("");
-    setNewFileLanguage("javascript");
+    setNewFileName('');
+    setNewFileLanguage('javascript');
   }, []);
 
   const openRenameDialog = useCallback((id, name) => {
@@ -87,14 +77,12 @@ const Filebar = () => {
   const closeRenameDialog = useCallback(() => {
     setIsRenameDialogOpen(false);
     setEditingFileId(null);
-    setEditFileName("");
+    setEditFileName('');
   }, []);
 
   const getCodeSnippet = (language) => {
-    const languageData = LANGUAGE_DATA.find(
-      (lang) => lang.language === language
-    );
-    return languageData ? languageData.codeSnippet : "";
+    const languageData = LANGUAGE_DATA.find((lang) => lang.language === language);
+    return languageData ? languageData.codeSnippet : '';
   };
 
   const handleAddFile = useCallback(async () => {
@@ -108,45 +96,44 @@ const Filebar = () => {
         await dispatch(createFile({ userId, file: newFile }));
         closeDialog();
       } catch (error) {
-        console.error("Failed to create file:", error);
+        console.error('Failed to create file:', error);
       }
     }
   }, [newFileName, newFileLanguage, userId, dispatch, closeDialog]);
 
-  const handleFileUpload = useCallback((event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const fileName = file.name;
-      const fileExtension = fileName.split(".").pop().toLowerCase();
+  const handleFileUpload = useCallback(
+    (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const fileName = file.name;
+        const fileExtension = fileName.split('.').pop().toLowerCase();
 
-      const languageData = LANGUAGE_DATA.find(
-        (lang) => lang.extension === fileExtension
-      );
+        const languageData = LANGUAGE_DATA.find((lang) => lang.extension === fileExtension);
 
-      if (languageData) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const content = e.target.result;
-          const newFile = {
-            name: fileName.replace(`.${fileExtension}`, ""),
-            language: languageData.language,
-            code: content,
+        if (languageData) {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            const content = e.target.result;
+            const newFile = {
+              name: fileName.replace(`.${fileExtension}`, ''),
+              language: languageData.language,
+              code: content,
+            };
+            try {
+              await dispatch(createFile({ userId, file: newFile }));
+            } catch (error) {
+              console.error('Failed to upload file:', error);
+            }
           };
-          try {
-            await dispatch(createFile({ userId, file: newFile }));
-          } catch (error) {
-            console.error("Failed to upload file:", error);
-          }
-        };
-        reader.readAsText(file);
-        setErrorMessage("");
-      } else {
-        setErrorMessage(
-          `Files with .${fileExtension} extension are not supported.`
-        );
+          reader.readAsText(file);
+          setErrorMessage('');
+        } else {
+          setErrorMessage(`Files with .${fileExtension} extension are not supported.`);
+        }
       }
-    }
-  }, [dispatch, userId]);
+    },
+    [dispatch, userId],
+  );
 
   const handleDeleteFile = useCallback((id) => {
     setFileToDeleteId(id);
@@ -159,14 +146,17 @@ const Filebar = () => {
         await dispatch(modifyFileName(userId, editingFileId, editFileName));
         closeRenameDialog();
       } catch (error) {
-        console.error("Failed to rename file:", error);
+        console.error('Failed to rename file:', error);
       }
     }
   }, [editFileName, editingFileId, userId, dispatch, closeRenameDialog]);
 
-  const handleSelectFile = useCallback((id) => {
-    dispatch(selectFile(id));
-  }, [dispatch]);
+  const handleSelectFile = useCallback(
+    (id) => {
+      dispatch(selectFile(id));
+    },
+    [dispatch],
+  );
 
   const confirmDelete = useCallback(async () => {
     if (fileToDeleteId) {
@@ -175,7 +165,7 @@ const Filebar = () => {
         setIsDeleteDialogOpen(false);
         setFileToDeleteId(null);
       } catch (error) {
-        console.error("Failed to delete file:", error);
+        console.error('Failed to delete file:', error);
       }
     }
   }, [fileToDeleteId, userId, dispatch]);
@@ -186,36 +176,31 @@ const Filebar = () => {
   }, []);
 
   const getLanguageIcon = (language) => {
-    const languageData = LANGUAGE_DATA.find(
-      (lang) => lang.language === language
-    );
-    return languageData ? languageData.icon : "";
+    const languageData = LANGUAGE_DATA.find((lang) => lang.language === language);
+    return languageData ? languageData.icon : '';
   };
 
   return (
     <div
       className="flex flex-col p-4 h-full overflow-y-auto"
       style={{
-        background:
-          GlobalTheme === "dark"
-            ? "linear-gradient(to bottom, #1e1e1e, #252526)"
-            : "linear-gradient(to bottom, #F9FAFB, #E5E7EB)",
-        borderRight: `1px solid ${
-          GlobalTheme === "dark" ? "#333333" : "#E5E7EB"
-        }`,
+        background: GlobalTheme === 'dark' ? '#000000' : '#ffffff',
+        borderRight: `1px solid ${GlobalTheme === 'dark' ? '#1a1a1a' : '#e5e5e5'}`,
       }}
     >
-      
-      <Box sx={{ display: "flex", gap: 2, marginBottom: 2 }}>
+      <Box sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
         <Button
           variant="contained"
           startIcon={<Add />}
           onClick={openDialog}
           sx={{
-            backgroundColor: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
-            color: "white",
-            "&:hover": {
-              backgroundColor: GlobalTheme === "dark" ? "#6bd8c2" : "#2563EB",
+            backgroundColor: GlobalTheme === 'dark' ? '#0ea5e9' : '#3b82f6',
+            color: '#fff',
+            fontWeight: 500,
+            textTransform: 'none',
+            borderRadius: '8px',
+            '&:hover': {
+              backgroundColor: GlobalTheme === 'dark' ? '#0284c7' : '#2563eb',
             },
           }}
         >
@@ -225,7 +210,7 @@ const Filebar = () => {
         <input
           type="file"
           id="file-upload"
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           onChange={handleFileUpload}
         />
         <label htmlFor="file-upload">
@@ -234,10 +219,13 @@ const Filebar = () => {
             startIcon={<Upload />}
             component="span"
             sx={{
-              backgroundColor: GlobalTheme === "dark" ? "#10B981" : "#34D399",
-              color: "white",
-              "&:hover": {
-                backgroundColor: GlobalTheme === "dark" ? "#059669" : "#2E8B57",
+              backgroundColor: GlobalTheme === 'dark' ? '#0ea5e9' : '#3b82f6',
+              color: '#fff',
+              fontWeight: 500,
+              textTransform: 'none',
+              borderRadius: '8px',
+              '&:hover': {
+                backgroundColor: GlobalTheme === 'dark' ? '#0284c7' : '#2563eb',
               },
             }}
           >
@@ -245,29 +233,27 @@ const Filebar = () => {
           </Button>
         </label>
 
-      <Button
+        <Button
           variant="contained"
-          startIcon={<Search />} 
+          startIcon={<Search />}
           onClick={openSearchDialog}
           sx={{
-            backgroundColor: GlobalTheme === "dark" ? "#F59E0B" : "#F59E0B",
-            color: "white",
-            "&:hover": {
-              backgroundColor: GlobalTheme === "dark" ? "#D97706" : "#D97706",
+            backgroundColor: GlobalTheme === 'dark' ? '#0ea5e9' : '#3b82f6',
+            color: '#fff',
+            fontWeight: 500,
+            textTransform: 'none',
+            borderRadius: '8px',
+            '&:hover': {
+              backgroundColor: GlobalTheme === 'dark' ? '#0284c7' : '#2563eb',
             },
           }}
-        >
-      </Button>
+        ></Button>
       </Box>
 
       <SearchFileDialog open={isSearchDialogOpen} onClose={closeSearchDialog} />
 
-
       {errorMessage && (
-        <Typography
-          variant="body2"
-          sx={{ color: "error.main", marginBottom: 2 }}
-        >
+        <Typography variant="body2" sx={{ color: 'error.main', marginBottom: 2 }}>
           {errorMessage}
         </Typography>
       )}
@@ -275,20 +261,16 @@ const Filebar = () => {
       <Typography
         variant="h6"
         sx={{
-          color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
+          color: GlobalTheme === 'dark' ? '#4ec9b0' : '#3B82F6',
           marginBottom: 2,
         }}
       >
         Files
       </Typography>
 
-
       {loading && (
         <div className="flex justify-center items-center p-4">
-          <ClipLoader
-            color={GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6"}
-            size={30}
-          />
+          <ClipLoader color={GlobalTheme === 'dark' ? '#4ec9b0' : '#3B82F6'} size={30} />
         </div>
       )}
 
@@ -299,21 +281,21 @@ const Filebar = () => {
               key={file.id}
               className={`mb-2 flex items-center justify-between p-2 rounded-md transition-all duration-200 ${
                 selectedFileId === file.id
-                  ? GlobalTheme === "dark"
-                    ? "bg-[#252526] shadow-lg scale-105"
-                    : "bg-gray-200 shadow-lg scale-105"
-                  : GlobalTheme === "dark"
-                  ? "hover:bg-[#2d2d2d] hover:scale-105"
-                  : "hover:bg-gray-100 hover:scale-105"
+                  ? GlobalTheme === 'dark'
+                    ? 'bg-[#252526] shadow-lg scale-105'
+                    : 'bg-gray-200 shadow-lg scale-105'
+                  : GlobalTheme === 'dark'
+                    ? 'hover:bg-[#2d2d2d] hover:scale-105'
+                    : 'hover:bg-gray-100 hover:scale-105'
               }`}
             >
               <Button
                 onClick={() => handleSelectFile(file.id)}
                 sx={{
-                  color: GlobalTheme === "dark" ? "#d4d4d4" : "#1F2937", 
-                  textTransform: "none",
-                  display: "flex",
-                  alignItems: "center",
+                  color: GlobalTheme === 'dark' ? '#d4d4d4' : '#1F2937',
+                  textTransform: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                 }}
               >
@@ -329,11 +311,11 @@ const Filebar = () => {
                 <IconButton
                   onClick={() => openRenameDialog(file.id, file.name)}
                   sx={{
-                    color: GlobalTheme === "dark" ? "#d4d4d4" : "#1F2937",
-                    transition: "color 0.2s, transform 0.2s",
-                    "&:hover": {
-                      color: GlobalTheme === "dark" ? "#6bd8c2" : "#2563EB",
-                      transform: "scale(1.1)",
+                    color: GlobalTheme === 'dark' ? '#d4d4d4' : '#1F2937',
+                    transition: 'color 0.2s, transform 0.2s',
+                    '&:hover': {
+                      color: GlobalTheme === 'dark' ? '#6bd8c2' : '#2563EB',
+                      transform: 'scale(1.1)',
                     },
                   }}
                 >
@@ -342,11 +324,11 @@ const Filebar = () => {
                 <IconButton
                   onClick={() => handleDeleteFile(file.id)}
                   sx={{
-                    color: GlobalTheme === "dark" ? "#d4d4d4" : "#1F2937",
-                    transition: "color 0.2s, transform 0.2s",
-                    "&:hover": {
-                      color: GlobalTheme === "dark" ? "#6bd8c2" : "#2563EB",
-                      transform: "scale(1.1)",
+                    color: GlobalTheme === 'dark' ? '#d4d4d4' : '#1F2937',
+                    transition: 'color 0.2s, transform 0.2s',
+                    '&:hover': {
+                      color: GlobalTheme === 'dark' ? '#6bd8c2' : '#2563EB',
+                      transform: 'scale(1.1)',
                     },
                   }}
                 >
@@ -358,63 +340,62 @@ const Filebar = () => {
         </ul>
       )}
 
-
-
-<Dialog open={isDialogOpen} onClose={closeDialog}>
-  <DialogTitle
-    sx={{
-      color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
-      fontWeight: "bold",
-      textAlign: "center",
-      padding: "16px",
-    }}
-  >
-    Create New File
-  </DialogTitle>
-  <DialogContent>
-    <TextField
-      fullWidth
-      label="File Name"
-      value={newFileName}
-      onChange={(e) => setNewFileName(e.target.value)}
-      sx={{ marginBottom: 2 }}
-    />
-    <TextField
-      fullWidth
-      select
-      label="Language"
-      value={newFileLanguage}
-      onChange={(e) => setNewFileLanguage(e.target.value)}
-      sx={{ marginBottom: 2 }}
-    >
-      {LANGUAGE_DATA.map((lang) => (
-        <MenuItem key={lang.language} value={lang.language}>
-          {lang.language} ({lang.version})
-        </MenuItem>
-      ))}
-    </TextField>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={closeDialog} startIcon={<Cancel />}>
-      Cancel
-    </Button>
-    <Button onClick={handleAddFile} startIcon={<Check />}>
-      Create
-    </Button>
-  </DialogActions>
-</Dialog>
+      <Dialog open={isDialogOpen} onClose={closeDialog}>
+        <DialogTitle
+          sx={{
+            color: GlobalTheme === 'dark' ? '#4ec9b0' : '#3B82F6',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            padding: '16px',
+          }}
+        >
+          Create New File
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="File Name"
+            value={newFileName}
+            onChange={(e) => setNewFileName(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            fullWidth
+            select
+            label="Language"
+            value={newFileLanguage}
+            onChange={(e) => setNewFileLanguage(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          >
+            {LANGUAGE_DATA.map((lang) => (
+              <MenuItem key={lang.language} value={lang.language}>
+                {lang.language} ({lang.version})
+              </MenuItem>
+            ))}
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog} startIcon={<Cancel />}>
+            Cancel
+          </Button>
+          <Button onClick={handleAddFile} startIcon={<Check />}>
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={isRenameDialogOpen} onClose={closeRenameDialog}>
         <DialogTitle
           sx={{
-            color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
-            fontWeight: "bold",
-            textAlign: "center",
-            padding: "16px",
+            color: GlobalTheme === 'dark' ? '#22d3ee' : '#2563eb',
+            fontWeight: '600',
+            textAlign: 'center',
+            fontSize: '1.25rem',
           }}
         >
           Rename File
         </DialogTitle>
+
         <DialogContent>
           <TextField
             fullWidth
@@ -436,10 +417,10 @@ const Filebar = () => {
       <Dialog open={isDeleteDialogOpen} onClose={cancelDelete}>
         <DialogTitle
           sx={{
-            color: GlobalTheme === "dark" ? "#4ec9b0" : "#3B82F6",
-            fontWeight: "bold",
-            textAlign: "center",
-            padding: "16px",
+            color: GlobalTheme === 'dark' ? '#4ec9b0' : '#3B82F6',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            padding: '16px',
           }}
         >
           Confirm Delete
@@ -456,12 +437,8 @@ const Filebar = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      
-
     </div>
-
   );
-}
+};
 
 export default memo(Filebar);
