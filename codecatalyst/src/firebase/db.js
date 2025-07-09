@@ -13,10 +13,22 @@ import {
 import { toast } from 'react-toastify';
 
 export class DatabaseService {
+  static instance = null;
   db;
+
   constructor() {
+    if (DatabaseService.instance) return DatabaseService.instance;
     this.db = getFirestore(app);
+    DatabaseService.instance = this;
   }
+
+  static getInstance() {
+    if (!DatabaseService.instance) {
+      DatabaseService.instance = new DatabaseService();
+    }
+    return DatabaseService.instance;
+  }
+
   async addFile(userId, file) {
     try {
       if (!userId) {
@@ -86,6 +98,7 @@ export class DatabaseService {
       throw error;
     }
   }
+
   async deleteFile(userId, fileId) {
     try {
       if (!userId) {
@@ -106,6 +119,7 @@ export class DatabaseService {
       throw error;
     }
   }
+
   async getFiles(userId) {
     try {
       if (!userId) {
@@ -126,6 +140,7 @@ export class DatabaseService {
       throw error;
     }
   }
+
   async searchFilesByPrefix(userId, prefix) {
     try {
       if (!userId) {
@@ -159,6 +174,5 @@ export class DatabaseService {
   }
 }
 
-const databaseService = new DatabaseService();
 
-export default databaseService;
+export default DatabaseService.getInstance();

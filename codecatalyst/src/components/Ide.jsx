@@ -22,7 +22,7 @@ import Header from './Header';
 import { useTheme } from '../hooks/useTheme';
 
 const Ide = () => {
-  const [theme, setTheme] = useState('vscodeDark');
+  const [theme, setTheme] = useState(() => localStorage.getItem('editor-theme') || 'vscodeDark');
   const [isWrappingEnabled, setIsWrappingEnabled] = useState(false);
   const [isTerminalVisible, setIsTerminalVisible] = useState(false);
   const [isFileBarVisible, setIsFileBarVisible] = useState(true);
@@ -46,6 +46,11 @@ const Ide = () => {
   const userId = useSelector((state) => state.auth.userId);
   const { GlobalTheme } = useTheme();
 
+  
+  useEffect(() => {
+    localStorage.setItem('editor-theme', theme);
+  }, [theme]);
+
   useEffect(() => {
     if (headerRef.current) {
       setHeaderHeight(headerRef.current.clientHeight);
@@ -57,6 +62,8 @@ const Ide = () => {
       setToolbarHeight(toolbarRef.current.clientHeight);
     }
   }, []);
+
+  
 
   const { language, code, setCode, selectedLanguageData, handleLanguageChange } = useLanguageData();
 
@@ -74,6 +81,7 @@ const Ide = () => {
         return javascript();
     }
   };
+
 
   const handleEditorChange = useCallback(
     (value) => {
@@ -104,13 +112,13 @@ const Ide = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div ref={headerRef} className="fixed top-0 left-0 w-full z-40">
+      <div ref={headerRef} className="fixed top-0 left-0 w-full">
         <Header />
       </div>
 
       <div
         ref={toolbarRef}
-        className="fixed left-0 w-full z-40"
+        className="fixed left-0 w-full"
         style={{ top: `${headerHeight}px` }}
       >
         <Toolbar

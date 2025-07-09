@@ -12,14 +12,24 @@ import { app } from '../conf/conf.js';
 import { toast } from 'react-toastify';
 
 export class AuthService {
+  static instance = null;
   auth;
   googleProvider;
   firestore;
 
   constructor() {
+    if (AuthService.instance) return AuthService.instance;
     this.auth = getAuth(app);
     this.googleProvider = new GoogleAuthProvider();
     this.firestore = getFirestore(app);
+    AuthService.instance = this;
+  }
+
+  static getInstance() {
+    if (!AuthService.instance) {
+      AuthService.instance = new AuthService();
+    }
+    return AuthService.instance;
   }
 
   async signupHandler(email, password) {
@@ -99,6 +109,4 @@ export class AuthService {
   }
 }
 
-const authService = new AuthService();
-
-export default authService;
+export default AuthService.getInstance();
