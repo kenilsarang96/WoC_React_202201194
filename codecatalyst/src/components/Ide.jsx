@@ -26,6 +26,9 @@ const Ide = () => {
   const [isWrappingEnabled, setIsWrappingEnabled] = useState(false);
   const [isTerminalVisible, setIsTerminalVisible] = useState(false);
   const [isFileBarVisible, setIsFileBarVisible] = useState(true);
+  
+  const FILEBAR_MIN_WIDTH = 350;
+  const FILEBAR_MAX_WIDTH = 520;
   const [fileBarWidth, setFileBarWidth] = useState(330);
   const [fontSize, setFontSize] = useState(() => {
     const savedFontSize = localStorage.getItem('editorFontSize');
@@ -65,10 +68,11 @@ const Ide = () => {
 
   
 
-  const { language, code, setCode, selectedLanguageData, handleLanguageChange } = useLanguageData();
+  const { language, code, setCode, selectedLanguageData, handleLanguageChange, saveStatus, lastSavedAt } = useLanguageData();
 
   const onResize = useCallback((event, { size }) => {
-    setFileBarWidth(size.width);
+    const next = Math.max(FILEBAR_MIN_WIDTH, Math.min(FILEBAR_MAX_WIDTH, size.width));
+    setFileBarWidth(next);
   }, []);
 
   const getLanguageExtension = () => {
@@ -139,6 +143,8 @@ const Ide = () => {
           language={language}
           handleLanguageChange={handleLanguageChange}
           THEMES={THEMES}
+          saveStatus={saveStatus}
+          lastSavedAt={lastSavedAt}
         />
       </div>
 
@@ -155,8 +161,8 @@ const Ide = () => {
               width={fileBarWidth}
               height={Infinity}
               onResize={onResize}
-              minConstraints={[200, Infinity]}
-              maxConstraints={[400, Infinity]}
+              minConstraints={[FILEBAR_MIN_WIDTH, Infinity]}
+              maxConstraints={[FILEBAR_MAX_WIDTH, Infinity]}
               axis="x"
               resizeHandles={['e']}
             >

@@ -21,6 +21,43 @@ import { useTheme } from '../hooks/useTheme';
 import SettingsPopup from './SettingsPopup';
 import { useSelector } from 'react-redux';
 
+function AutoSaveIndicator({ saveStatus, lastSavedAt, textColor }) {
+  const isVisible = saveStatus && saveStatus !== 'idle';
+  const label =
+    saveStatus === 'saving' || saveStatus === 'debouncing'
+      ? 'Saving…'
+      : saveStatus === 'saved'
+      ? 'Saved'
+      : saveStatus === 'error'
+      ? 'Save failed'
+      : 'Saved';
+  const color = saveStatus === 'error' ? '#f44336' : textColor || '#9e9e9e';
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        minWidth: 110,
+        justifyContent: 'flex-end',
+        whiteSpace: 'nowrap',
+        color,
+      }}
+    >
+      <Box sx={{ visibility: isVisible ? 'visible' : 'hidden', display: 'flex', alignItems: 'center', gap: 1 }}>
+        {(saveStatus === 'saving' || saveStatus === 'debouncing') && (
+          <CircularProgress size={14} thickness={4} sx={{ color }} />
+        )}
+        {saveStatus === 'saved' && (
+          <Box sx={{ width: 8, height: 8, bgcolor: '#4caf50', borderRadius: '50%' }} />
+        )}
+        <span style={{ fontSize: 12 }}>{label}</span>
+      </Box>
+    </Box>
+  );
+}
+
 const ToolbarComponent = ({
   authStatus,
   theme,
@@ -37,12 +74,14 @@ const ToolbarComponent = ({
   language,
   handleLanguageChange,
   THEMES = {},
+  saveStatus,
+  lastSavedAt,
 }) => {
   const { GlobalTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const isExecuting = useSelector((state) => state.execution.isExecuting);
 
-  // Simplified theme colors without borders
+ 
   const currentTheme = {
     appBar: GlobalTheme === 'dark' ? '#1E1E1E' : '#FFFFFF',
     text: GlobalTheme === 'dark' ? '#FFFFFF' : '#000000',
@@ -233,6 +272,10 @@ const ToolbarComponent = ({
 
           {/* Right Section */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Auto-save indicator (lightweight, professional) */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 1 }}>
+              <AutoSaveIndicator saveStatus={saveStatus} lastSavedAt={lastSavedAt} textColor={currentTheme.text} />
+            </Box>
             <Tooltip title="Settings">
               <IconButton
                 onClick={handleSettingsOpen}

@@ -15,6 +15,8 @@ export const useLanguageData = () => {
   const [language, setLanguage] = useState('javascript');
   const [code, setCode] = useState('');
   const saveTimeoutRef = useRef(null);
+  const [saveStatus, setSaveStatus] = useState('idle'); // idle | debouncing | saving | saved | error
+  const [lastSavedAt, setLastSavedAt] = useState(null);
 
   useEffect(() => {
     if (!authStatus) {
@@ -55,15 +57,38 @@ export const useLanguageData = () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
+      setSaveStatus('debouncing');
       saveTimeoutRef.current = setTimeout(() => {
         try {
-          dispatch(modifyFileCode(userId, selectedFile.id, newCode));
+          setSaveStatus('saving');
+          Promise.resolve(dispatch(modifyFileCode(userId, selectedFile.id, newCode)))
+            .then(() => {
+              setSaveStatus('saved');
+              const ts = Date.now();
+              setLastSavedAt(ts);
+              // auto reset to idle after 2s
+              setTimeout(() => {
+                // if no further save started since ts
+                setSaveStatus((curr) => (curr === 'saved' ? 'idle' : curr));
+              }, 2000);
+            })
+            .catch((error) => {
+              console.error('Failed to save code to Firestore:', error);
+              setSaveStatus('error');
+            });
         } catch (error) {
           console.error('Failed to save code to Firestore:', error);
+          setSaveStatus('error');
         }
-      }, 3000);
+      }, 2500);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
+  }, []);
 
   return {
     language,
@@ -71,5 +96,7 @@ export const useLanguageData = () => {
     setCode: handleCodeChange,
     selectedLanguageData,
     handleLanguageChange,
+    saveStatus,
+    lastSavedAt,
   };
 };
